@@ -7,8 +7,6 @@ public class GestorUtilizadores {
 
     private static GestorUtilizadores instance = null;
 
-    private ArrayList<Utilizador> utilizadores = new ArrayList<>();
-
     private GestorUtilizadores() {
     }
 
@@ -25,25 +23,27 @@ public class GestorUtilizadores {
     public void criarUtilizador(String id, String email, String first_name, String last_name, String avatar) {
         Utilizador utilizador = new Utilizador(id, email, first_name, last_name, avatar);
 
-        if (funcionalidades.criarUtilizador(utilizador)) {
+        Resposta resposta = funcionalidades.criarUtilizador(utilizador);
+
+        if (resposta.getErro().isEmpty()) {
             System.out.println("Utilizador criado com sucesso");
         } else {
-            System.out.println("Erro ao criar utilizador");
+            System.out.println("Erro ao criar utilizador: " + resposta.getErro());
         }
     }
 
     public void consultarDadosUtilizador(String id) {
-        Utilizador utilizador = funcionalidades.consultarDadosUtilizador(id);
+        Resposta resposta = funcionalidades.consultarDadosUtilizador(id);
 
-        if (utilizador != null) {
-            System.out.println(utilizador.getFirst_name() + " " + utilizador.getLast_name());
+        if (resposta.getErro().isEmpty()) {
+            System.out.println(resposta.getUtilizadoresDevolvidos().get(0).getFirst_name() + " " + resposta.getUtilizadoresDevolvidos().get(0).getLast_name());
         } else {
-            System.out.println("Utilizador não encontrado");
+            System.out.println("Erro ao consultar dados de utilizador: " + resposta.getErro());
         }
     }
 
     public void listarUtilizadores() {
-        ArrayList<Utilizador> utilizadores = funcionalidades.listarUtilizadores();
+        ArrayList<Utilizador> utilizadores = funcionalidades.listarUtilizadores().getUtilizadoresDevolvidos();
 
         for (Utilizador utilizador : utilizadores) {
             System.out.println(utilizador.getFirst_name() + " " + utilizador.getLast_name());
@@ -51,33 +51,36 @@ public class GestorUtilizadores {
     }
 
     public void registarUtilizador(String email, String password) {
-        if (funcionalidades.registarUtilizador(email, password))
+        Resposta resposta = funcionalidades.registarUtilizador(email, password);
+
+        if (resposta.getErro().isEmpty())
             System.out.println("Utilizador registado com sucesso");
         else
-            System.out.println("Erro ao registar utilizador");
+            System.out.println("Erro ao registar utilizador: " + resposta.getErro());
     }
 
     public void autenticarUtilizador(String email, String password) {
+        Resposta resposta = funcionalidades.autenticarUtilizador(email, password);
 
-        if (funcionalidades.autenticarUtilizador(email, password))
-            System.out.println("Autenticado com sucesso");
+        if (resposta.getErro().isEmpty())
+            System.out.println("Utilizador registado com sucesso");
         else
-            System.out.println("Erro de autenticação");
+            System.out.println("Erro ao autenticar utilizador: " + resposta.getErro());
     }
 
 
     public void consultarRecurso(String id) {
-        Recurso recurso = funcionalidades.consultarRecurso(id);
+        Resposta resposta = funcionalidades.consultarRecurso(id);
 
-        if (recurso != null) {
-            System.out.println(recurso.getName() + " " + recurso.getYear());
+        if (resposta.getErro().isEmpty()) {
+            System.out.println(resposta.getRecursosDevolvidos().get(0).getName() + " " + resposta.getRecursosDevolvidos().get(0).getYear());
         } else {
-            System.out.println("Recurso não encontrado");
+            System.out.println("Erro ao consultar recurso: " + resposta.getErro());
         }
     }
 
     public void listarRecursos() {
-        ArrayList<Recurso> recursos = funcionalidades.listarRecursos();
+        ArrayList<Recurso> recursos = funcionalidades.listarRecursos().getRecursosDevolvidos();
 
         for (Recurso recurso : recursos) {
             System.out.println(recurso.getName() + " " + recurso.getYear());

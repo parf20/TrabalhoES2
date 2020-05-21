@@ -10,7 +10,7 @@ import java.util.Scanner;
 
 public class Main {
 
-    public static void main(String[] args) {
+    public static void main(String[] args)  {
 
         Scanner scanner = new Scanner(System.in);
 
@@ -41,36 +41,36 @@ public class Main {
 
             switch (escolha) {
                 case "1":
-                    System.out.println("Insiro o id do utilizador");
+                    System.out.println("Insira o id do utilizador");
                     String id = scanner.nextLine();
-                    System.out.println("Insiro o email do utilizador");
+                    System.out.println("Insira o email do utilizador");
                     String email = scanner.nextLine();
-                    System.out.println("Insiro o primeiro nome do utilizador");
+                    System.out.println("Insira o primeiro nome do utilizador");
                     String firstName = scanner.nextLine();
-                    System.out.println("Insiro o ultimo nome do utilizador");
+                    System.out.println("Insira o ultimo nome do utilizador");
                     String lastName = scanner.nextLine();
-                    System.out.println("Insiro o avatar do utilizador");
+                    System.out.println("Insira o avatar do utilizador");
                     String avatar = scanner.nextLine();
                     GestorUtilizadores.getInstance().criarUtilizador(id, email, firstName, lastName, avatar);
                     break;
                 case "2":
-                    System.out.println("Insiro o id do utilizador");
+                    System.out.println("Insira o id do utilizador");
                     GestorUtilizadores.getInstance().consultarDadosUtilizador(scanner.nextLine());
                     break;
                 case "3":
                     GestorUtilizadores.getInstance().listarUtilizadores();
                     break;
                 case "4":
-                    System.out.println("Insiro o email");
+                    System.out.println("Insira o email");
                     String emailRegister = scanner.nextLine();
-                    System.out.println("Insiro a palavra-passe");
+                    System.out.println("Insira a palavra-passe");
                     String passwordregister = scanner.nextLine();
                     GestorUtilizadores.getInstance().registarUtilizador(emailRegister, passwordregister);
                     break;
                 case "5":
-                    System.out.println("Insiro o email");
+                    System.out.println("Insira o email");
                     String emailLogin = scanner.nextLine();
-                    System.out.println("Insiro a palavra-passe");
+                    System.out.println("Insira a palavra-passe");
                     String passwordLogin = scanner.nextLine();
                     GestorUtilizadores.getInstance().autenticarUtilizador(emailLogin, passwordLogin);
 
@@ -79,7 +79,7 @@ public class Main {
                     GestorUtilizadores.getInstance().listarRecursos();
                     break;
                 case "7":
-                    System.out.println("Insiro o id do recurso");
+                    System.out.println("Insira o id do recurso");
                     GestorUtilizadores.getInstance().consultarRecurso(scanner.nextLine());
                     break;
                 case "8":

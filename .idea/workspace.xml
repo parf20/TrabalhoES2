@@ -1,7 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="dd67f166-70cf-4297-a848-7bdc57959ed0" name="Default Changelist" comment="" />
+    <list default="true" id="dd67f166-70cf-4297-a848-7bdc57959ed0" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/src/Resposta.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tests/TestsStub.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/trabalhoFinalES2/FuncionalidadesInferface.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/trabalhoFinalES2/FuncionalidadesInferface.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/trabalhoFinalES2/FuncionalidadesStub$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/trabalhoFinalES2/FuncionalidadesStub$1.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/trabalhoFinalES2/FuncionalidadesStub.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/trabalhoFinalES2/FuncionalidadesStub.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/trabalhoFinalES2/GestorUtilizadores.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/trabalhoFinalES2/GestorUtilizadores.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/trabalhoFinalES2/Main.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/trabalhoFinalES2/Main.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/FuncionalidadesInferface.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/FuncionalidadesInferface.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/FuncionalidadesStub.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/FuncionalidadesStub.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/GestorUtilizadores.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/GestorUtilizadores.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Main.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/trabalhoFinalES2.iml" beforeDir="false" afterPath="$PROJECT_DIR$/trabalhoFinalES2.iml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -15,27 +29,84 @@
       </list>
     </option>
   </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
   <component name="ProjectId" id="1bfdGJuspxKM4LcZfjvGtWF0g8z" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showExcludedFiles" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
+    <property name="Downloaded.Files.Path.Enabled" value="false" />
+    <property name="Repository.Attach.Annotations" value="false" />
+    <property name="Repository.Attach.JavaDocs" value="false" />
+    <property name="Repository.Attach.Sources" value="false" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/../aula testes integraçao" />
+    <property name="project.structure.last.edited" value="Modules" />
+    <property name="project.structure.proportion" value="0.0" />
+    <property name="project.structure.side.proportion" value="0.2" />
   </component>
-  <component name="RunManager">
-    <configuration name="Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="Main" />
+  <component name="RunManager" selected="JUnit.TestsStub">
+    <configuration name="TestsStub" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="trabalhoFinalES2" />
+      <option name="PACKAGE_NAME" value="" />
+      <option name="MAIN_CLASS_NAME" value="TestsStub" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="TestsStub.cursotestConsultarReInexistente" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="trabalhoFinalES2" />
+      <option name="PACKAGE_NAME" value="" />
+      <option name="MAIN_CLASS_NAME" value="TestsStub" />
+      <option name="METHOD_NAME" value="cursotestConsultarReInexistente" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="TestsStub.testCriarUtilizadorEmailVazio" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="trabalhoFinalES2" />
+      <option name="PACKAGE_NAME" value="" />
+      <option name="MAIN_CLASS_NAME" value="TestsStub" />
+      <option name="METHOD_NAME" value="testCriarUtilizadorEmailVazio" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="TestsStub.testRecursoIdNull" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="trabalhoFinalES2" />
+      <option name="PACKAGE_NAME" value="" />
+      <option name="MAIN_CLASS_NAME" value="TestsStub" />
+      <option name="METHOD_NAME" value="testRecursoIdNull" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="TestsStub.testRecursoIdVazio" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="trabalhoFinalES2" />
+      <option name="PACKAGE_NAME" value="" />
+      <option name="MAIN_CLASS_NAME" value="TestsStub" />
+      <option name="METHOD_NAME" value="testRecursoIdVazio" />
+      <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Application.Main" />
+        <item itemvalue="JUnit.TestsStub" />
+        <item itemvalue="JUnit.TestsStub.testCriarUtilizadorEmailVazio" />
+        <item itemvalue="JUnit.TestsStub.testRecursoIdNull" />
+        <item itemvalue="JUnit.TestsStub.testRecursoIdVazio" />
+        <item itemvalue="JUnit.TestsStub.cursotestConsultarReInexistente" />
       </list>
     </recent_temporary>
   </component>
@@ -53,34 +124,42 @@
     <servers />
   </component>
   <component name="WindowStateProjectService">
-    <state x="556" y="199" key="#com.intellij.ide.util.MemberChooser" timestamp="1589476162455">
+    <state x="556" y="199" key="#com.intellij.ide.util.MemberChooser" timestamp="1589556474282">
       <screen x="0" y="0" width="1500" height="960" />
     </state>
-    <state x="556" y="199" key="#com.intellij.ide.util.MemberChooser/0.0.1500.960@0.0.1500.960" timestamp="1589476162455" />
+    <state x="556" y="199" key="#com.intellij.ide.util.MemberChooser/0.0.1500.960@0.0.1500.960" timestamp="1589556474282" />
     <state x="531" y="238" key="FileChooserDialogImpl" timestamp="1589298920187">
       <screen x="0" y="0" width="1500" height="960" />
     </state>
     <state x="531" y="238" key="FileChooserDialogImpl/0.0.1500.960@0.0.1500.960" timestamp="1589298920187" />
-    <state width="1458" height="311" key="GridCell.Tab.0.bottom" timestamp="1589476747463">
+    <state width="1458" height="2" key="GridCell.Tab.0.bottom" timestamp="1589977897489">
       <screen x="0" y="0" width="1500" height="960" />
     </state>
-    <state width="1458" height="311" key="GridCell.Tab.0.bottom/0.0.1500.960@0.0.1500.960" timestamp="1589476747463" />
-    <state width="1458" height="311" key="GridCell.Tab.0.center" timestamp="1589476747463">
+    <state width="1458" height="2" key="GridCell.Tab.0.bottom/0.0.1500.960@0.0.1500.960" timestamp="1589977897489" />
+    <state width="1458" height="2" key="GridCell.Tab.0.center" timestamp="1589977897489">
       <screen x="0" y="0" width="1500" height="960" />
     </state>
-    <state width="1458" height="311" key="GridCell.Tab.0.center/0.0.1500.960@0.0.1500.960" timestamp="1589476747463" />
-    <state width="1458" height="311" key="GridCell.Tab.0.left" timestamp="1589476747463">
+    <state width="1458" height="2" key="GridCell.Tab.0.center/0.0.1500.960@0.0.1500.960" timestamp="1589977897489" />
+    <state width="1458" height="2" key="GridCell.Tab.0.left" timestamp="1589977897489">
       <screen x="0" y="0" width="1500" height="960" />
     </state>
-    <state width="1458" height="311" key="GridCell.Tab.0.left/0.0.1500.960@0.0.1500.960" timestamp="1589476747463" />
-    <state width="1458" height="311" key="GridCell.Tab.0.right" timestamp="1589476747463">
+    <state width="1458" height="2" key="GridCell.Tab.0.left/0.0.1500.960@0.0.1500.960" timestamp="1589977897489" />
+    <state width="1458" height="2" key="GridCell.Tab.0.right" timestamp="1589977897489">
       <screen x="0" y="0" width="1500" height="960" />
     </state>
-    <state width="1458" height="311" key="GridCell.Tab.0.right/0.0.1500.960@0.0.1500.960" timestamp="1589476747463" />
-    <state x="458" y="308" key="com.intellij.ide.util.TipDialog" timestamp="1589476085721">
+    <state width="1458" height="2" key="GridCell.Tab.0.right/0.0.1500.960@0.0.1500.960" timestamp="1589977897489" />
+    <state x="231" y="58" key="SettingsEditor" timestamp="1589642498493">
       <screen x="0" y="0" width="1500" height="960" />
     </state>
-    <state x="458" y="308" key="com.intellij.ide.util.TipDialog/0.0.1500.960@0.0.1500.960" timestamp="1589476085721" />
+    <state x="231" y="58" key="SettingsEditor/0.0.1500.960@0.0.1500.960" timestamp="1589642498493" />
+    <state x="458" y="308" key="com.intellij.ide.util.TipDialog" timestamp="1590066766290">
+      <screen x="0" y="0" width="1500" height="960" />
+    </state>
+    <state x="458" y="308" key="com.intellij.ide.util.TipDialog/0.0.1500.960@0.0.1500.960" timestamp="1590066766290" />
+    <state x="473" y="382" key="com.intellij.jarRepository.RepositoryAttachDialog-DOWNLOAD" timestamp="1589642878742">
+      <screen x="0" y="0" width="1500" height="960" />
+    </state>
+    <state x="473" y="382" key="com.intellij.jarRepository.RepositoryAttachDialog-DOWNLOAD/0.0.1500.960@0.0.1500.960" timestamp="1589642878742" />
     <state x="175" y="107" key="new project wizard" timestamp="1589238851379">
       <screen x="0" y="0" width="1500" height="960" />
     </state>
