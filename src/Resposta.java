@@ -3,7 +3,7 @@ import java.util.ArrayList;
 public class Resposta {
 
     int codigo;
-    String erro;
+    String erro="";
     ArrayList<Utilizador> utilizadoresDevolvidos = new ArrayList<>();
     ArrayList<Recurso> recursosDevolvidos = new ArrayList<>();
 
@@ -123,7 +123,7 @@ public class Resposta {
     public Resposta autenticarUtilizadorCredenciaisInvalidas() {
         Resposta resposta = new Resposta();
         resposta.setCodigo(400);
-        resposta.setErro("Utilizador não encontrado");
+        resposta.setErro("Utilizador não encontrado ou corpo do pedido sem combinação campos de e-mail e/ou password");
         return resposta;
     }
 
@@ -136,26 +136,9 @@ public class Resposta {
     }
 
 
-    //consultar dados recurso existente
-    public Resposta consultarDadosRecursoExistente(Recurso recurso) {
-        Resposta resposta = new Resposta();
-        resposta.setCodigo(200);
-        ArrayList<Recurso> recursoDevolvido = new ArrayList<>();
-        recursoDevolvido.add(recurso);
-        resposta.setRecursosDevolvidos(recursoDevolvido);
-        return resposta;
-    }
-
-    //consultar dados recurso inexistente
-    public Resposta consultarDadosRecursoInexistente() {
-        Resposta resposta = new Resposta();
-        resposta.setCodigo(404);
-        resposta.setErro("Recurso não encontrado");
-        return resposta;
-    }
 
     //listagem de recursos com sucesso
-    public Resposta listagemRecursosSucesso(ArrayList<Recurso> recursosDevolvidos) {
+    public Resposta listarRecursosSucesso(ArrayList<Recurso> recursosDevolvidos) {
         Resposta resposta = new Resposta();
         resposta.setCodigo(200);
         resposta.setRecursosDevolvidos(recursosDevolvidos);

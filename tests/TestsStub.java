@@ -127,7 +127,7 @@ public class TestsStub {
     }
 
     @Test
-    public void testCriRUtilizadorEmailFormatoInvalido() {
+    public void testCriarUtilizadorFormatoInvalido() {
         FuncionalidadesStub funcionalidadesStub = new FuncionalidadesStub();
         assertEquals(400, funcionalidadesStub.criarUtilizador(new Utilizador("10", "novomail.com", "Novo", "Teste", "ewffewfewefw.jpg")).getCodigo());
     }
@@ -148,6 +148,14 @@ public class TestsStub {
     public void testCriarUtilizadorEmailNull() {
         FuncionalidadesStub funcionalidadesStub = new FuncionalidadesStub();
         assertEquals(204, funcionalidadesStub.criarUtilizador(new Utilizador("10", null, "Novo", "Teste", "ewffewfewefw.jpg")).getCodigo());
+    }
+
+
+    //testes listar utilizadores
+    @Test
+    public void testListarUtilizadoresSucesso(){
+        FuncionalidadesStub funcionalidadesStub=new FuncionalidadesStub();
+        assertEquals(200,funcionalidadesStub.listarUtilizadores().getCodigo());
     }
 
 
@@ -180,15 +188,6 @@ public class TestsStub {
 
 
 
-    //testes listar utilizadores
-    @Test
-    public void testListarUtilizadoresSucesso(){
-        FuncionalidadesStub funcionalidadesStub=new FuncionalidadesStub();
-        assertEquals(200,funcionalidadesStub.listarUtilizadores().getCodigo());
-    }
-
-
-
     //testes listar recursos
     @Test
     public void testListarRecursosSucesso(){
@@ -206,7 +205,7 @@ public class TestsStub {
     }
 
     @Test
-    public void cursotestConsultarReInexistente(){
+    public void testConsultarRecursoInexistente(){
         FuncionalidadesStub funcionalidadesStub = new FuncionalidadesStub();
         assertEquals(404, funcionalidadesStub.consultarRecurso("0").getCodigo());
         assertEquals(404, funcionalidadesStub.consultarRecurso("5").getCodigo());

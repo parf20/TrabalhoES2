@@ -115,7 +115,7 @@ public class FuncionalidadesStub implements FuncionalidadesInferface {
 
     @Override
     public Resposta listarRecursos() {
-        return new Resposta().listagemRecursosSucesso(recursos);
+        return new Resposta().listarRecursosSucesso(recursos);
     }
 
     @Override
