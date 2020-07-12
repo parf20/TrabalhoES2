@@ -5,175 +5,453 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TestsAplicacao {
 
 
     //testes ao login
     @Test
-    public void testAutenticacaoSucesso() throws IOException {
-        assertEquals(200, Funcoes.autenticarUtilizador("eve.holt@reqres.in", "cityslicka").getCodigo());
+    public void testAutenticacaoSucesso() throws IOException, InvalidCredentialsException, NullEmptyFieldException {
+        assertDoesNotThrow(() -> {
+            GestorUtilizadores.getInstance().autenticarUtilizador("eve.holt@reqres.in", "cityslicka");
+        });
     }
 
     @Test
     public void testAutenticacaoCredenciaisInvalidas() throws IOException {
-        assertEquals(400, Funcoes.autenticarUtilizador("test@mail.com", "egwegwgew").getCodigo());
+        assertThrows(InvalidCredentialsException.class, () -> {
+            GestorUtilizadores.getInstance().autenticarUtilizador("test@mail.com", "egwegwgew");
+        });
     }
 
     @Test
-    public void testAutenticacaoEmailNull() throws IOException {
-        assertEquals(204, Funcoes.autenticarUtilizador(null, "rereher").getCodigo());
+    public void testAutenticacaoEmailFormatoInvalido() {
+        assertThrows(InvalidEmailFormatException.class, () -> {
+            GestorUtilizadores.getInstance().autenticarUtilizador("testmail.com", "cityslicka");
+        });
     }
 
     @Test
-    public void testAutenticacaoPasswordNull() throws IOException {
-        assertEquals(204, Funcoes.autenticarUtilizador("test@mail.com", null).getCodigo());
+    public void testAutenticacaoEmailLimiteInferior() {
+        assertThrows(InvalidEmailFormatException.class, () -> {
+            GestorUtilizadores.getInstance().autenticarUtilizador("a@es.in", "cityslicka");
+        });
     }
 
     @Test
-    public void testAutenticacaoEmailPasswordNull() throws IOException {
-        assertEquals(204, Funcoes.autenticarUtilizador(null, null).getCodigo());
+    public void testAutenticacaoEmailLimiteSuperior() {
+        assertThrows(InvalidEmailFormatException.class, () -> {
+            GestorUtilizadores.getInstance().autenticarUtilizador("asdzxcqwsadertfgvbfcd@reqres.in", "cityslicka");
+        });
     }
 
     @Test
-    public void testAutenticacaoEmailVazio() throws IOException {
-        assertEquals(204, Funcoes.autenticarUtilizador("", "ergererheh").getCodigo());
+    public void testAutenticacaoEmailLimiteMinimo() throws NullEmptyFieldException, InvalidEmailFormatException, InvalidCredentialsException, InvalidPasswordFormatException {
+        assertDoesNotThrow(() -> {
+            GestorUtilizadores.getInstance().autenticarUtilizador("qwerty@reqres.in", "123456");
+        });
     }
 
     @Test
-    public void testAutenticacaoPasswordVazia() throws IOException {
-        assertEquals(204, Funcoes.autenticarUtilizador("test@mail.com", "").getCodigo());
+    public void testAutenticacaoEmailLimiteMaximo() throws NullEmptyFieldException, InvalidEmailFormatException, InvalidCredentialsException, InvalidPasswordFormatException {
+        assertDoesNotThrow(() -> {
+            GestorUtilizadores.getInstance().autenticarUtilizador("asdzxcqwsadertfgvbfc@reqres.in", "passwordtest12345678");
+        });
     }
 
     @Test
-    public void testAutenticacaoEmailPasswordVazios() throws IOException {
-        assertEquals(204, Funcoes.autenticarUtilizador("", "").getCodigo());
+    public void testAutenticacaoPasswordLimiteInferior() throws NullEmptyFieldException, InvalidEmailFormatException, InvalidCredentialsException, InvalidPasswordFormatException {
+        assertThrows(InvalidPasswordFormatException.class, () -> {
+            GestorUtilizadores.getInstance().autenticarUtilizador("eve.holt@reqres.in", "12345");
+        });
+    }
+
+    @Test
+    public void testAutenticacaoPasswordLimiteSuperior() throws NullEmptyFieldException, InvalidEmailFormatException, InvalidCredentialsException, InvalidPasswordFormatException {
+        assertThrows(InvalidPasswordFormatException.class, () -> {
+            GestorUtilizadores.getInstance().autenticarUtilizador("eve.holt@reqres.in", "passwordtest123456789");
+        });
+    }
+
+    @Test
+    public void testAutenticacaoPasswordLimiteMinimo() throws NullEmptyFieldException, InvalidEmailFormatException, InvalidCredentialsException, InvalidPasswordFormatException {
+        assertDoesNotThrow(() -> {
+            GestorUtilizadores.getInstance().autenticarUtilizador("qwerty@reqres.in", "123456");
+        });
+    }
+
+    @Test
+    public void testAutenticacaoPasswordLimiteMaximo() throws NullEmptyFieldException, InvalidEmailFormatException, InvalidCredentialsException, InvalidPasswordFormatException {
+        assertDoesNotThrow(() -> {
+            GestorUtilizadores.getInstance().autenticarUtilizador("asdzxcqwsadertfgvbfc@reqres.in", "passwordtest12345678");
+        });
+    }
+
+    @Test
+    public void testAutenticacaoEmailNull() throws IOException, InvalidCredentialsException, NullEmptyFieldException {
+        assertThrows(NullEmptyFieldException.class, () -> {
+            GestorUtilizadores.getInstance().autenticarUtilizador(null, "cityslicka");
+        });
+    }
+
+    @Test
+    public void testAutenticacaoPasswordNull() throws IOException, InvalidCredentialsException, NullEmptyFieldException {
+        assertThrows(NullEmptyFieldException.class, () -> {
+            GestorUtilizadores.getInstance().autenticarUtilizador("eve.holt@reqres.in", null);
+        });
+    }
+
+    @Test
+    public void testAutenticacaoEmailPasswordNull() throws IOException, InvalidCredentialsException, NullEmptyFieldException {
+        assertThrows(NullEmptyFieldException.class, () -> {
+            GestorUtilizadores.getInstance().autenticarUtilizador(null, null);
+        });
+    }
+
+    @Test
+    public void testAutenticacaoEmailVazio() throws IOException, InvalidCredentialsException, NullEmptyFieldException {
+        assertThrows(NullEmptyFieldException.class, () -> {
+            GestorUtilizadores.getInstance().autenticarUtilizador("", "cityslicka");
+        });
+    }
+
+    @Test
+    public void testAutenticacaoPasswordVazia() throws IOException, InvalidCredentialsException, NullEmptyFieldException {
+        assertThrows(NullEmptyFieldException.class, () -> {
+            GestorUtilizadores.getInstance().autenticarUtilizador("eve.holt@reqres.in", "");
+        });
+    }
+
+    @Test
+    public void testAutenticacaoEmailPasswordVazios() throws IOException, InvalidCredentialsException, NullEmptyFieldException {
+        assertThrows(NullEmptyFieldException.class, () -> {
+            GestorUtilizadores.getInstance().autenticarUtilizador("", "");
+        });
     }
 
 
     //testes ao registo
     @Test
-    public void testRegistoSucesso() throws IOException {
-        assertEquals(200, Funcoes.registarUtilizador("eve.holt@reqres.in", "pistol").getCodigo());
+    public void testRegistoSucesso() throws IOException, UserNotFoundException, NullEmptyFieldException {
+        assertDoesNotThrow(() -> {
+            GestorUtilizadores.getInstance().registarUtilizador("george.bluth@reqres.in", "cityslicka");
+        });
     }
 
     @Test
-    public void testRegistoUtilizadorNaoCriado() throws IOException {
-        assertEquals(400, Funcoes.registarUtilizador("test@mail.com", "test").getCodigo());
+    public void testRegistoUtilizadorNaoCriado() throws IOException, UserNotFoundException, NullEmptyFieldException {
+        assertThrows(UserNotFoundException.class, () -> {
+            GestorUtilizadores.getInstance().registarUtilizador("teste@mail.com", "cityslicka");
+        });
     }
 
     @Test
-    public void testRegistoEmailNull() throws IOException {
-        assertEquals(204, Funcoes.registarUtilizador(null, "test").getCodigo());
+    public void testRegistoUtilizadorJaRegistado() throws IOException, UserNotFoundException, NullEmptyFieldException {
+        assertThrows(UserExistingException.class, () -> {
+            GestorUtilizadores.getInstance().registarUtilizador("eve.holt@reqres.in", "cityslicka");
+        });
     }
 
     @Test
-    public void testRegistoPasswordNull() throws IOException {
-        assertEquals(204, Funcoes.registarUtilizador("test@mail.com", null).getCodigo());
+    public void testRegistoEmailFormatoInvalido() throws IOException, UserNotFoundException, NullEmptyFieldException {
+        assertThrows(InvalidEmailFormatException.class, () -> {
+            GestorUtilizadores.getInstance().registarUtilizador("testemail.com", "cityslicka");
+        });
     }
 
     @Test
-    public void testRegistoEmailPasswordNull() throws IOException {
-        assertEquals(204, Funcoes.registarUtilizador(null, null).getCodigo());
+    public void testRegistoEmailLimiteInferior() throws IOException, UserNotFoundException, NullEmptyFieldException {
+        assertThrows(InvalidEmailFormatException.class, () -> {
+            GestorUtilizadores.getInstance().registarUtilizador("b@es.in", "cityslicka");
+        });
     }
 
     @Test
-    public void testRegistoEmailVazio() throws IOException {
-        assertEquals(204, Funcoes.registarUtilizador("", "test").getCodigo());
+    public void testRegistoEmailLimiteSuperior() throws IOException, UserNotFoundException, NullEmptyFieldException {
+        assertThrows(InvalidEmailFormatException.class, () -> {
+            GestorUtilizadores.getInstance().registarUtilizador("asdzxcqwsadertfgvbfce@reqres.in", "cityslicka");
+        });
     }
 
     @Test
-    public void testRegistoPasswordVazia() throws IOException {
-        assertEquals(204, Funcoes.registarUtilizador("test@mail.com", "").getCodigo());
+    public void testRegistoEmailLimiteMinimo() throws IOException, UserNotFoundException, NullEmptyFieldException {
+        assertDoesNotThrow(() -> {
+            GestorUtilizadores.getInstance().registarUtilizador("qwertu@reqres.in", "cityslicka");
+        });
     }
 
     @Test
-    public void testRegistoEmailPasswordVazios() throws IOException {
-        assertEquals(204, Funcoes.registarUtilizador("", "").getCodigo());
+    public void testRegistoEmailLimiteMaximo() throws IOException, UserNotFoundException, NullEmptyFieldException {
+        assertDoesNotThrow(() -> {
+            GestorUtilizadores.getInstance().registarUtilizador("asdxcqwsadertfgvbfce@reqres.in", "cityslicka");
+        });
+    }
+
+    @Test
+    public void testRegistoPasswordLimiteInferior() throws IOException, UserNotFoundException, NullEmptyFieldException {
+        assertThrows(InvalidPasswordFormatException.class, () -> {
+            GestorUtilizadores.getInstance().registarUtilizador("george.edwards@reqres.in", "12345");
+        });
+    }
+
+    @Test
+    public void testRegistoPasswordLimiteSuperior() throws IOException, UserNotFoundException, NullEmptyFieldException {
+        assertThrows(InvalidPasswordFormatException.class, () -> {
+            GestorUtilizadores.getInstance().registarUtilizador("george.edwards@reqres.in", "passwordtest123456789");
+        });
+    }
+
+    @Test
+    public void testRegistoPasswordLimiteMinimo() throws IOException, UserNotFoundException, NullEmptyFieldException {
+        assertDoesNotThrow(() -> {
+            GestorUtilizadores.getInstance().registarUtilizador("rachel.howell@reqres.in", "123456");
+        });
+    }
+
+    @Test
+    public void testRegistoPasswordLimiteMaximo() throws IOException, UserNotFoundException, NullEmptyFieldException {
+        assertDoesNotThrow(() -> {
+            GestorUtilizadores.getInstance().registarUtilizador("george.edwards@reqres.in", "passwordtest12345678");
+        });
+    }
+
+    @Test
+    public void testRegistoEmailNull() throws IOException, UserNotFoundException, NullEmptyFieldException {
+        assertThrows(NullEmptyFieldException.class, () -> {
+            GestorUtilizadores.getInstance().registarUtilizador(null, "cityslicka");
+        });
+    }
+
+    @Test
+    public void testRegistoPasswordNull() throws IOException, UserNotFoundException, NullEmptyFieldException {
+        assertThrows(NullEmptyFieldException.class, () -> {
+            GestorUtilizadores.getInstance().registarUtilizador("george.edwards@reqres.in", null);
+        });
+    }
+
+    @Test
+    public void testRegistoEmailPasswordNull() throws IOException, UserNotFoundException, NullEmptyFieldException {
+        assertThrows(NullEmptyFieldException.class, () -> {
+            GestorUtilizadores.getInstance().registarUtilizador(null, null);
+        });
+    }
+
+    @Test
+    public void testRegistoEmailVazio() throws IOException, UserNotFoundException, NullEmptyFieldException {
+        assertThrows(NullEmptyFieldException.class, () -> {
+            GestorUtilizadores.getInstance().registarUtilizador("", "cityslicka");
+        });
+    }
+
+    @Test
+    public void testRegistoPasswordVazia() throws IOException, UserNotFoundException, NullEmptyFieldException {
+        assertThrows(NullEmptyFieldException.class, () -> {
+            GestorUtilizadores.getInstance().registarUtilizador("george.edwards@reqres.in", "");
+        });
+    }
+
+    @Test
+    public void testRegistoEmailPasswordVazios() throws IOException, UserNotFoundException, NullEmptyFieldException {
+        assertThrows(NullEmptyFieldException.class, () -> {
+            GestorUtilizadores.getInstance().registarUtilizador("", "");
+        });
     }
 
 
     //testes ao criar utilizador
     @Test
-    public void testCriarUtilizadorSucesso() throws IOException {
-        assertEquals(201, Funcoes.criarUtilizador(new Utilizador("13", "test@mail.com", "New", "Test", "eergrgegregreggergregre.jpg")).getCodigo());
+    public void testCriarUtilizadorSucesso() throws IOException, InvalidEmailFormatException, NullEmptyFieldException {
+        assertDoesNotThrow(() -> {
+            GestorUtilizadores.getInstance().criarUtilizador("13", "test@mail.com", "New", "Test", "eergrgegregreggergregre.jpg");
+        });
     }
 
     @Test
-    public void testCriRUtilizadorEmailFormatoInvalido() throws IOException {
-        assertEquals(400, Funcoes.criarUtilizador(new Utilizador("13", "test.com", "New", "Test", "eergrgegregreggergregre.jpg")).getCodigo());
+    public void testCriarUtilizadorJaExistente() throws IOException, InvalidEmailFormatException, NullEmptyFieldException {
+        assertThrows(UserExistingException.class, () -> {
+            GestorUtilizadores.getInstance().criarUtilizador("13", "eve.holt@reqres.in", "New", "Test", "eergrgegregreggergregre.jpg");
+        });
+    }
+
+
+    @Test
+    public void testCrirUtilizadorEmailFormatoInvalido() throws IOException, InvalidEmailFormatException, NullEmptyFieldException {
+        assertThrows(InvalidEmailFormatException.class, () -> {
+            GestorUtilizadores.getInstance().criarUtilizador("13", "testmail.com", "New", "Test", "eergrgegregreggergregre.jpg");
+        });
     }
 
     @Test
-    public void testCriarUtilizadorNull() throws IOException {
-        assertEquals(204, Funcoes.criarUtilizador(null).getCodigo());
+    public void testCriarUtilizadorEmailLimiteInferior() throws IOException, InvalidEmailFormatException, NullEmptyFieldException {
+        assertThrows(InvalidEmailFormatException.class, () -> {
+            GestorUtilizadores.getInstance().criarUtilizador("13", "b@es.in", "New", "Test", "eergrgegregreggergregre.jpg");
+        });
     }
 
     @Test
-    public void testCriarUtilizadorEmailVazio() throws IOException {
-        assertEquals(204, Funcoes.criarUtilizador(new Utilizador("13", "", "New", "Test", "eergrgegregreggergregre.jpg")).getCodigo());
+    public void testCriarUtilizadorEmailLimiteSuperior() throws IOException, InvalidEmailFormatException, NullEmptyFieldException {
+        assertThrows(InvalidEmailFormatException.class, () -> {
+            GestorUtilizadores.getInstance().criarUtilizador("13", "asdzxcqwsadertfgvbfce@reqres.in", "New", "Test", "eergrgegregreggergregre.jpg");
+        });
     }
 
     @Test
-    public void testCriarUtilizadorEmailNull() throws IOException {
-        assertEquals(204, Funcoes.criarUtilizador(new Utilizador("13", null, "New", "Test", "eergrgegregreggergregre.jpg")).getCodigo());
+    public void testCriarUtilizadorEmailLimiteMinimo() throws IOException, InvalidEmailFormatException, NullEmptyFieldException {
+        assertDoesNotThrow(() -> {
+            GestorUtilizadores.getInstance().criarUtilizador("13", "ab@es.in", "New", "Test", "eergrgegregreggergregre.jpg");
+        });
     }
+
+    @Test
+    public void testCriarUtilizadorEmailLimiteMaximo() throws IOException, InvalidEmailFormatException, NullEmptyFieldException {
+        assertDoesNotThrow(() -> {
+            GestorUtilizadores.getInstance().criarUtilizador("13", "asdzxcqwsadertgvbfce@reqres.in", "New", "Test", "eergrgegregreggergregre.jpg");
+        });
+    }
+
+    @Test
+    public void testCriarUtilizadorNull() throws IOException, InvalidEmailFormatException, NullEmptyFieldException {
+        assertThrows(NullEmptyFieldException.class, () -> {
+            GestorUtilizadores.getInstance().criarUtilizador("13", null, "New", "Test", "eergrgegregreggergregre.jpg");
+        });
+    }
+
+    @Test
+    public void testCriarUtilizadorEmailVazio() throws IOException, InvalidEmailFormatException, NullEmptyFieldException {
+        assertThrows(NullEmptyFieldException.class, () -> {
+            GestorUtilizadores.getInstance().criarUtilizador("13", "", "New", "Test", "eergrgegregreggergregre.jpg");
+        });
+    }
+
+    @Test
+    public void testCriarUtilizadorEmailNull() throws IOException, InvalidEmailFormatException, NullEmptyFieldException {
+        assertThrows(NullEmptyFieldException.class, () -> {
+            GestorUtilizadores.getInstance().criarUtilizador("13", null, "New", "Test", "eergrgegregreggergregre.jpg");
+        });
+    }
+
+
+
+
+
+
+
+
+
+    //testes consultar utilizador
+    @Test
+    public void testConsultarUtilizadorLimiteMaximo() throws IOException, JSONException, UserNotFoundException, NullEmptyFieldException {
+       assertDoesNotThrow(()->{
+           GestorUtilizadores.getInstance().consultarDadosUtilizador("12");
+       });
+    }
+
+    @Test
+    public void testConsultarUtilizadorLimiteMinimo() throws IOException, JSONException, UserNotFoundException, NullEmptyFieldException {
+        assertDoesNotThrow(()->{
+            GestorUtilizadores.getInstance().consultarDadosUtilizador("1");
+        });
+    }
+
+    @Test
+    public void testConsultarUtilizadorLimiteSuperior() throws IOException, JSONException, UserNotFoundException, NullEmptyFieldException {
+        assertThrows(UserNotFoundException.class,()->{
+            GestorUtilizadores.getInstance().consultarDadosUtilizador("13");
+        });
+    }
+
+    @Test
+    public void testConsultarUtilizadoLimiteInferior() throws IOException, JSONException, UserNotFoundException, NullEmptyFieldException {
+        assertThrows(UserNotFoundException.class,()->{
+            GestorUtilizadores.getInstance().consultarDadosUtilizador("0");
+        });
+    }
+
+    @Test
+    public void testConsultarUtilizadorIdVazio() throws IOException, JSONException, UserNotFoundException, NullEmptyFieldException {
+        assertThrows(NullEmptyFieldException.class,()->{
+            GestorUtilizadores.getInstance().consultarDadosUtilizador("");
+        });
+    }
+
+    @Test
+    public void testConsultarUtilizadorIdNull() throws IOException, JSONException, UserNotFoundException, NullEmptyFieldException {
+        assertThrows(NullEmptyFieldException.class,()->{
+            GestorUtilizadores.getInstance().consultarDadosUtilizador(null);
+        });
+    }
+
+
+
+
+
+
 
 
     //testes listar utilizadores
     @Test
     public void testListarUtilizadoresSucesso() throws IOException, JSONException {
-        assertEquals(200, Funcoes.listarUtilizadores().getCodigo());
+        assertDoesNotThrow(()->{
+            GestorUtilizadores.getInstance().listarUtilizadores();
+        });
     }
 
 
-    //testes consultar utilizador
+
+    //testes listar recursos
     @Test
-    public void testConsultarUtilizadorSucesso() throws IOException, JSONException {
-        assertEquals(200, Funcoes.consultarDadosUtilizador("1").getCodigo());
-        assertEquals(200, Funcoes.consultarDadosUtilizador("12").getCodigo());
+    public void testListarRecursosSucesso() throws IOException, JSONException {
+        assertDoesNotThrow(()->{
+            GestorUtilizadores.getInstance().listarUtilizadores();
+        });
     }
 
-    @Test
-    public void testConsultarUtilizadorInexistente() {
-        FuncionalidadesStub funcionalidadesStub = new FuncionalidadesStub();
-        assertEquals(404, funcionalidadesStub.consultarDadosUtilizador("0").getCodigo());
-        assertEquals(404, funcionalidadesStub.consultarDadosUtilizador("13").getCodigo());
-    }
 
-    @Test
-    public void testConsultarUtilizadorIdVazio() throws IOException, JSONException {
-        assertEquals(204, Funcoes.consultarDadosUtilizador("").getCodigo());
-    }
-
-    @Test
-    public void testConsultarUtilizadorIdNull() throws IOException, JSONException {
-        assertEquals(204, Funcoes.consultarDadosUtilizador(null).getCodigo());
-    }
 
 
     //testes consultar recurso
     @Test
-    public void testConsultarRecursoSucesso() throws IOException, JSONException {
-        assertEquals(200, Funcoes.consultarRecurso("1").getCodigo());
-        assertEquals(200, Funcoes.consultarRecurso("12").getCodigo());
+    public void testConsultarRecursoLimiteMaximo() throws IOException, JSONException, UserNotFoundException, NullEmptyFieldException {
+        assertDoesNotThrow(()->{
+            GestorUtilizadores.getInstance().consultarRecurso("12");
+        });
     }
 
     @Test
-    public void testConsultarRecursoInexistente() throws IOException, JSONException {
-        assertEquals(404, Funcoes.consultarRecurso("0").getCodigo());
-        assertEquals(404, Funcoes.consultarRecurso("13").getCodigo());
+    public void testConsultarRecursoLimiteMinimo() throws IOException, JSONException, UserNotFoundException, NullEmptyFieldException {
+        assertDoesNotThrow(()->{
+            GestorUtilizadores.getInstance().consultarRecurso("1");
+        });
     }
 
     @Test
-    public void testConsultarRecursoIdVazio() throws IOException, JSONException {
-        assertEquals(204, Funcoes.consultarRecurso("").getCodigo());
+    public void testConsultarRecursoLimiteSuperior() throws IOException, JSONException, UserNotFoundException, NullEmptyFieldException {
+        assertThrows(ResourceNotFoundException.class,()->{
+            GestorUtilizadores.getInstance().consultarRecurso("13");
+        });
     }
 
     @Test
-    public void testConsulultarRecursoIdNull() throws IOException, JSONException {
-        assertEquals(204, Funcoes.consultarRecurso(null).getCodigo());
+    public void testConsultarRecursoLimiteInferior() throws IOException, JSONException, UserNotFoundException, NullEmptyFieldException {
+        assertThrows(ResourceNotFoundException.class,()->{
+            GestorUtilizadores.getInstance().consultarRecurso("0");
+        });
     }
+
+    @Test
+    public void testConsultarRecursoIdVazio() throws IOException, JSONException, UserNotFoundException, NullEmptyFieldException {
+        assertThrows(NullEmptyFieldException.class,()->{
+            GestorUtilizadores.getInstance().consultarRecurso("");
+        });
+    }
+
+    @Test
+    public void testConsultarRecursoIdNull() throws IOException, JSONException, UserNotFoundException, NullEmptyFieldException {
+        assertThrows(NullEmptyFieldException.class,()->{
+            GestorUtilizadores.getInstance().consultarRecurso(null);
+        });
+    }
+
 
 }

@@ -7,77 +7,80 @@ public class FuncionalidadesStub implements FuncionalidadesInferface {
     private ArrayList<Recurso> recursos = new ArrayList<>();
 
     private HashMap<String, String> credenciais = new HashMap<>() {{
-        put("admin@mail.com", "admin");
+        put("asdzxcqwsadertfgvbfc@reqres.in", "passwordtest12345678");
+        put("qwerty@reqres.in", "123456");
+        put("eve.holt@reqres.in", "cityslicka");
     }};
 
 
     FuncionalidadesStub() {
-        utilizadores.add(new Utilizador("1", "ruben@mail.com", "Ruben", "Almeida", "regerger.jpg"));
-        utilizadores.add(new Utilizador("2", "teste2@mail.com", "Francisco", "Morais", "regerger.jpg"));
-        utilizadores.add(new Utilizador("3", "teste3@mail.com", "Pedro", "Vieira", "regerger.jpg"));
-        utilizadores.add(new Utilizador("4", "teste4@mail.com", "Alexandre", "Roberto", "regerger.jpg"));
-        utilizadores.add(new Utilizador("5", "admin@mail.com", "Admin", "Admin", "regerger.jpg"));
+        utilizadores.add(new Utilizador("1", "asdzxcqwsadertfgvbfc@reqres.in", "John", "Doe", "regerger.jpg"));
+        utilizadores.add(new Utilizador("2", "qwerty@reqres.in", "Lorem", "Ipsum", "regerger.jpg"));
+        utilizadores.add(new Utilizador("3", "qwertu@reqres.in", "Lindsay", "Ferguson", "regerger.jpg"));
+        utilizadores.add(new Utilizador("4", "asdxcqwsadertfgvbfce@reqres.in", "Tobias", "Funke", "regerger.jpg"));
+        utilizadores.add(new Utilizador("5", "byron.fields@reqres.in", "Byron", "Fields", "regerger.jpg"));
+        utilizadores.add(new Utilizador("6", "george.edwards@reqres.in", "George", "Edwards", "regerger.jpg"));
+        utilizadores.add(new Utilizador("7", "rachel.howell@reqres.in", "Rachel", "Howell", "regerger.jpg"));
+        utilizadores.add(new Utilizador("8", "george.bluth@reqres.in", "George", "Bluth", "regerger.jpg"));
+        utilizadores.add(new Utilizador("9", "emma.wong@reqres.in", "Emma", "Wong", "regerger.jpg"));
+        utilizadores.add(new Utilizador("10", "janet.weaver@reqres.in", "Janet", "weaver", "regerger.jpg"));
+        utilizadores.add(new Utilizador("11", "jeve.holt@reqres.in", "Jane", "Holt", "regerger.jpg"));
+        utilizadores.add(new Utilizador("12", "eve.holt@reqres.in", "Eve", "Holt", "regerger.jpg"));
 
 
-        recursos.add(new Recurso("1", "recurso 1", "2020", "#dddddd", "17-2031"));
-        recursos.add(new Recurso("2", "recurso 2", "2020", "#aaaaaa", "17-2032"));
-        recursos.add(new Recurso("3", "recurso 3", "2020", "#bbbbbb", "17-2033"));
-        recursos.add(new Recurso("4", "recurso 4", "2020", "#cccccc", "17-2034"));
+        recursos.add(new Recurso("1", "cerulean", "2000", "#98B2D1", "15-4020"));
+        recursos.add(new Recurso("2", "uchsia rose", "2001", "#C74375", "17-2031"));
+        recursos.add(new Recurso("3", "true red", "2002", "#BF1932", "19-1664"));
+        recursos.add(new Recurso("4", "aqua sky", "2003", "#98B2D1", "15-4020"));
+        recursos.add(new Recurso("5", "tigerlily", "2004", "#E2583E", "15-4020"));
+        recursos.add(new Recurso("6", "blue turquoise", "2005", "#53B0AE", "15-4020"));
+        recursos.add(new Recurso("7", "sand dollar", "2006", "#DECDBE", "15-4020"));
+        recursos.add(new Recurso("8", "chili pepper", "2007", "#5A5B9F", "15-4020"));
+        recursos.add(new Recurso("9", "blue iris", "2008", "#F0C05A", "15-4020"));
+        recursos.add(new Recurso("10", "mimosa", "2009", "#45B5AA", "15-4020"));
+        recursos.add(new Recurso("11", "turquoise", "2010", "#D94F70", "15-4020"));
+        recursos.add(new Recurso("12", "honeysuckle", "2011", "#98B2D1", "18-2120"));
+
 
     }
 
     @Override
-    public Resposta criarUtilizador(Utilizador utilizador) {
+    public Resposta criarUtilizador(Utilizador utilizador) throws NullEmptyFieldException, InvalidEmailFormatException, UserExistingException {
 
-        if (utilizador == null)
-            return new Resposta().criarUtilizadorNull();
+        if (utilizador.getEmail() == null || utilizador.getEmail().isEmpty())
+            throw new NullEmptyFieldException();
 
-        if (utilizador.getEmail() == null)
-            return new Resposta().criarUtilizadorEmailVazioNulo();
+        if (!utilizador.getEmail().contains("@") || !utilizador.getEmail().contains("."))
+            throw new InvalidEmailFormatException();
 
-        if (utilizador.getEmail().isEmpty())
-            return new Resposta().criarUtilizadorEmailVazioNulo();
-
-        if (!utilizador.getEmail().contains("@"))
-            return new Resposta().criarUtilizadorEmailFormatoInvalido();
+        if (!(utilizador.getEmail().length() >= 8 && utilizador.getEmail().length() <= 30))
+            throw new InvalidEmailFormatException();
 
         for (Utilizador utilizador1 : utilizadores) {
             if (utilizador1.getEmail().equals(utilizador.getEmail()))
-                return new Resposta().criarUtilizadorExistente();
+                throw new UserExistingException();
         }
         return new Resposta().criarUtilizadorSucesso();
 
     }
 
     @Override
-    public Resposta consultarDadosUtilizador(String id) {
-
-        if (id == null)
-            return new Resposta().consultarDadosUtilizadorIdVazioNulo();
-
-        if (id.isEmpty())
-            return new Resposta().consultarDadosUtilizadorIdVazioNulo();
-
-        for (Utilizador utilizador : utilizadores) {
-            if (utilizador.getId().equals(id))
-                return new Resposta().consultarDadosUtilizadorExistente(utilizador);
-        }
-        return new Resposta().consultarDadosUtilizadorInexistente();
-    }
-
-    @Override
-    public Resposta listarUtilizadores() {
-        return new Resposta().listarUtilizadoresSucesso(utilizadores);
-    }
-
-    @Override
-    public Resposta registarUtilizador(String email, String password) {
+    public Resposta registarUtilizador(String email, String password) throws NullEmptyFieldException, UserNotFoundException, UserExistingException, InvalidEmailFormatException, InvalidPasswordFormatException {
 
         if (email == null || password == null)
-            return new Resposta().registarUtilizadorCredenciaisVazias();
+            throw new NullEmptyFieldException();
 
         if (email.isEmpty() || password.isEmpty())
-            return new Resposta().registarUtilizadorCredenciaisVazias();
+            throw new NullEmptyFieldException();
+
+        if (!email.contains("@") || !email.contains("."))
+            throw new InvalidEmailFormatException();
+
+        if (!(email.length() >= 8 && email.length() <= 30))
+            throw new InvalidEmailFormatException();
+
+        if (!(password.length() >= 6 && password.length() <= 20))
+            throw new InvalidPasswordFormatException();
 
         boolean existe = false;
         for (Utilizador utilizador : utilizadores) {
@@ -87,10 +90,10 @@ public class FuncionalidadesStub implements FuncionalidadesInferface {
             }
         }
         if (!existe)
-            return new Resposta().registarUtilizadorNaoCriado();
+            throw new UserNotFoundException();
 
         if (credenciais.containsKey(email))
-            return new Resposta().registarUtilizadorJaRegistado();
+            throw new UserExistingException();
         else {
             credenciais.put(email, password);
             return new Resposta().registarUtilizadorSucesso();
@@ -99,18 +102,47 @@ public class FuncionalidadesStub implements FuncionalidadesInferface {
     }
 
     @Override
-    public Resposta autenticarUtilizador(String email, String password) {
+    public Resposta autenticarUtilizador(String email, String password) throws NullEmptyFieldException, InvalidCredentialsException, InvalidEmailFormatException, InvalidPasswordFormatException {
 
         if (email == null || password == null)
-            return new Resposta().autenticarUtilizadorCredenciaisVazias();
+            throw new NullEmptyFieldException();
 
         if (email.isEmpty() || password.isEmpty())
-            return new Resposta().autenticarUtilizadorCredenciaisVazias();
+            throw new NullEmptyFieldException();
+
+        if (!email.contains("@") || !email.contains("."))
+            throw new InvalidEmailFormatException();
+
+        if (!(email.length() >= 8 && email.length() <= 30))
+            throw new InvalidEmailFormatException();
+
+        if (!(password.length() >= 6 && password.length() <= 20))
+            throw new InvalidPasswordFormatException();
 
         if (credenciais.containsKey(email) && credenciais.get(email).equals(password)) {
             return new Resposta().autenticarUtilizadorSucesso();
         }
-        return new Resposta().autenticarUtilizadorCredenciaisInvalidas();
+
+        throw new InvalidCredentialsException();
+    }
+
+
+    @Override
+    public Resposta consultarDadosUtilizador(String id) throws NullEmptyFieldException, UserNotFoundException {
+
+        if (id == null || id.isEmpty())
+            throw new NullEmptyFieldException();
+
+        for (Utilizador utilizador : utilizadores) {
+            if (utilizador.getId().equals(id))
+                return new Resposta().consultarDadosUtilizadorExistente(utilizador);
+        }
+        throw new UserNotFoundException();
+    }
+
+    @Override
+    public Resposta listarUtilizadores() {
+        return new Resposta().listarUtilizadoresSucesso(utilizadores);
     }
 
     @Override
@@ -119,17 +151,14 @@ public class FuncionalidadesStub implements FuncionalidadesInferface {
     }
 
     @Override
-    public Resposta consultarRecurso(String id) {
-        if (id == null)
-            return new Resposta().consultarRecursoIdVazioNulo();
-
-        if (id.isEmpty())
-            return new Resposta().consultarRecursoIdVazioNulo();
+    public Resposta consultarRecurso(String id) throws NullEmptyFieldException, ResourceNotFoundException {
+        if (id == null || id.isEmpty())
+            throw new NullEmptyFieldException();
 
         for (Recurso recurso : recursos) {
             if (recurso.getId().equals(id))
                 return new Resposta().consultarRecursoExistente(recurso);
         }
-        return new Resposta().consultarRecursoInexistente();
+        throw new ResourceNotFoundException();
     }
 }

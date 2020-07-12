@@ -5,10 +5,42 @@ import java.util.Scanner;
 
 public class Main {
 
-    public static void main(String[] args) throws IOException, JSONException {
+    public static void main(String[] args) throws IOException, JSONException, ResourceNotFoundException, NullEmptyFieldException, UserNotFoundException, InvalidEmailFormatException, InvalidCredentialsException, UserExistingException, InvalidPasswordFormatException {
 
 
         Scanner scanner = new Scanner(System.in);
+
+        System.out.println("\n\nAplicação de gestão de utilizadores\n");
+        System.out.println("1-Efetuar autenticação");
+        System.out.println("2-Efetuar registo");
+
+
+        String selecao = "";
+        while (true) {
+            selecao = scanner.nextLine();
+            if (selecao.equals("1") || selecao.equals("2")) {
+                break;
+            } else
+                System.out.println("Por favor insira um número de funcionalidade válido");
+        }
+
+
+        if (selecao.equals("1")) {
+            System.out.println("Insira o email");
+            String emailLogin = scanner.nextLine();
+            System.out.println("Insira a palavra-passe");
+            String passwordLogin = scanner.nextLine();
+            GestorUtilizadores.getInstance().autenticarUtilizador(emailLogin, passwordLogin);
+            System.out.println("\n\nAutenticado com sucesso!");
+        } else {
+            System.out.println("Insira o email");
+            String emailRegister = scanner.nextLine();
+            System.out.println("Insira a palavra-passe");
+            String passwordregister = scanner.nextLine();
+            GestorUtilizadores.getInstance().registarUtilizador(emailRegister, passwordregister);
+            System.out.println("\n\nRegistado com sucesso!");
+        }
+
 
         while (true) {
 
@@ -30,7 +62,7 @@ public class Main {
                 if (escolha.equals("1") || escolha.equals("2") || escolha.equals("3") || escolha.equals("4") || escolha.equals("5") || escolha.equals("6") || escolha.equals("7") || escolha.equals("8")) {
                     break;
                 } else
-                    System.out.println("Por favor escolha uma escolha válida");
+                    System.out.println("Por favor insira um número de funcionalidade válido");
             }
 
 
@@ -83,8 +115,6 @@ public class Main {
 
 
         }
-
-
 
 
     }

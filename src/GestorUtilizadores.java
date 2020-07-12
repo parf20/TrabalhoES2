@@ -22,29 +22,28 @@ public class GestorUtilizadores {
         return instance;
     }
 
-
+/*
     //código para utilizar stub
 
-/*
-    public void criarUtilizador(String id, String email, String first_name, String last_name, String avatar) {
+    public void criarUtilizador(String id, String email, String first_name, String last_name, String avatar) throws NullEmptyFieldException, InvalidEmailFormatException, UserExistingException {
         Utilizador utilizador = new Utilizador(id, email, first_name, last_name, avatar);
 
         Resposta resposta = funcionalidades.criarUtilizador(utilizador);
 
-        if (resposta.getErro().isEmpty()) {
+        if (resposta.getMensagem().equals("OK")) {
             System.out.println("Utilizador criado com sucesso");
         } else {
-            System.out.println("Erro ao criar utilizador: " + resposta.getErro());
+            System.out.println("Erro ao criar utilizador");
         }
     }
 
-    public void consultarDadosUtilizador(String id) {
+    public void consultarDadosUtilizador(String id) throws UserNotFoundException, NullEmptyFieldException {
         Resposta resposta = funcionalidades.consultarDadosUtilizador(id);
 
-        if (resposta.getErro().isEmpty()) {
+        if (resposta.getMensagem().equals("OK")) {
             System.out.println(resposta.getUtilizadoresDevolvidos().get(0).getFirst_name() + " " + resposta.getUtilizadoresDevolvidos().get(0).getLast_name());
         } else {
-            System.out.println("Erro ao consultar dados de utilizador: " + resposta.getErro());
+            System.out.println("Erro ao consultar dados de utilizador");
         }
     }
 
@@ -56,33 +55,36 @@ public class GestorUtilizadores {
         }
     }
 
-    public void registarUtilizador(String email, String password) {
+    public void registarUtilizador(String email, String password) throws UserNotFoundException, UserExistingException, NullEmptyFieldException, InvalidEmailFormatException, InvalidPasswordFormatException, InvalidCredentialsException {
         Resposta resposta = funcionalidades.registarUtilizador(email, password);
 
-        if (resposta.getErro().isEmpty())
+        if (resposta.getMensagem().equals("OK")) {
             System.out.println("Utilizador registado com sucesso");
-        else
-            System.out.println("Erro ao registar utilizador: " + resposta.getErro());
+        } else {
+            System.out.println("Erro ao registar utilizador");
+        }
     }
 
-    public void autenticarUtilizador(String email, String password) {
+    public void autenticarUtilizador(String email, String password) throws InvalidCredentialsException, NullEmptyFieldException, InvalidEmailFormatException, InvalidPasswordFormatException {
         Resposta resposta = funcionalidades.autenticarUtilizador(email, password);
 
-        if (resposta.getErro().isEmpty())
-            System.out.println("Utilizador registado com sucesso");
-        else
-            System.out.println("Erro ao autenticar utilizador: " + resposta.getErro());
+        if (resposta.getMensagem().equals("OK")) {
+            System.out.println("Utilizador autenticado com sucesso");
+        } else {
+            System.out.println("Erro ao autenticar utilizador");
+        }
     }
 
 
-    public void consultarRecurso(String id) {
+    public void consultarRecurso(String id) throws ResourceNotFoundException, NullEmptyFieldException {
         Resposta resposta = funcionalidades.consultarRecurso(id);
 
-        if (resposta.getErro().isEmpty()) {
+        if (resposta.getMensagem().equals("OK")) {
             System.out.println(resposta.getRecursosDevolvidos().get(0).getName() + " " + resposta.getRecursosDevolvidos().get(0).getYear());
         } else {
-            System.out.println("Erro ao consultar recurso: " + resposta.getErro());
+            System.out.println("Erro ao consultar recurso");
         }
+
     }
 
     public void listarRecursos() {
@@ -93,31 +95,35 @@ public class GestorUtilizadores {
         }
 
     }
+
+
 */
+
+
 
 
 //código com a aplicação integrada
 
-    public void criarUtilizador(String id, String email, String first_name, String last_name, String avatar) throws IOException {
+    public void criarUtilizador(String id, String email, String first_name, String last_name, String avatar) throws IOException, InvalidEmailFormatException, NullEmptyFieldException, UserExistingException {
         Utilizador utilizador = new Utilizador(id, email, first_name, last_name, avatar);
 
         Resposta resposta = Funcoes.criarUtilizador(utilizador);
 
-        if (resposta.getErro().isEmpty()) {
+        if (resposta.getMensagem().equals("OK")) {
             System.out.println("Utilizador criado com sucesso");
         } else {
-            System.out.println("Erro ao criar utilizador: " + resposta.getErro());
+            System.out.println("Erro ao criar utilizador");
         }
     }
 
 
-    public void consultarDadosUtilizador(String id) throws IOException, JSONException {
+    public void consultarDadosUtilizador(String id) throws IOException, JSONException, UserNotFoundException, NullEmptyFieldException {
         Resposta resposta = Funcoes.consultarDadosUtilizador(id);
 
-        if (resposta.getErro().isEmpty()) {
+        if (resposta.getMensagem().equals("OK")) {
             System.out.println(resposta.getUtilizadoresDevolvidos().get(0).getFirst_name() + " " + resposta.getUtilizadoresDevolvidos().get(0).getLast_name());
         } else {
-            System.out.println("Erro ao consultar dados de utilizador: " + resposta.getErro());
+            System.out.println("Erro ao consultar dados de utilizador");
         }
     }
 
@@ -131,32 +137,36 @@ public class GestorUtilizadores {
     }
 
 
-    public void registarUtilizador(String email, String password) throws IOException {
+    public void registarUtilizador(String email, String password) throws IOException, UserNotFoundException, NullEmptyFieldException, InvalidEmailFormatException, InvalidPasswordFormatException, UserExistingException {
         Resposta resposta = Funcoes.registarUtilizador(email, password);
 
-        if (resposta.getErro().isEmpty())
+        if (resposta.getMensagem().equals("OK")) {
             System.out.println("Utilizador registado com sucesso");
-        else
-            System.out.println("Erro ao registar utilizador: " + resposta.getErro());
+        }
+        else {
+            System.out.println("Erro ao registar utilizador");
+        }
     }
 
-    public void autenticarUtilizador(String email, String password) throws IOException {
+    public void autenticarUtilizador(String email, String password) throws IOException, InvalidCredentialsException, NullEmptyFieldException, InvalidEmailFormatException, InvalidPasswordFormatException {
         Resposta resposta = Funcoes.autenticarUtilizador(email, password);
 
-        if (resposta.getErro().isEmpty())
+        if (resposta.getMensagem().equals("OK")) {
             System.out.println("Utilizador autenticado com sucesso");
-        else
-            System.out.println("Erro ao autenticar utilizador: " + resposta.getErro());
+        }
+        else {
+            System.out.println("Erro ao autenticar utilizador");
+        }
     }
 
 
-    public void consultarRecurso(String id) throws IOException, JSONException {
+    public void consultarRecurso(String id) throws IOException, JSONException, ResourceNotFoundException, NullEmptyFieldException {
         Resposta resposta = funcionalidades.consultarRecurso(id);
 
-        if (resposta.getErro().isEmpty()) {
+        if (resposta.getMensagem().equals("OK")) {
             System.out.println(resposta.getRecursosDevolvidos().get(0).getName() + " " + resposta.getRecursosDevolvidos().get(0).getYear());
         } else {
-            System.out.println("Erro ao consultar recurso: " + resposta.getErro());
+            System.out.println("Erro ao consultar recurso");
         }
     }
 
@@ -168,4 +178,9 @@ public class GestorUtilizadores {
         }
 
     }
+
+
+
+
+
 }

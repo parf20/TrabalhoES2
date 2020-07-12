@@ -1,9 +1,7 @@
 import org.junit.Test;
 
-import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.ProtocolException;
 import java.net.URL;
@@ -15,12 +13,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class TestsApi {
 
 
+    //   !!  o content type faz com que os testes falhem mesmo quando tudo esta correto
+
+
     //testes do login
     @Test
     public void testAutenticacaoSucesso() throws IOException {
-        URL url = new URL("https://reqres.in/api/login/");
+        URL url = new URL("https://reqres.in/api/login");
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         con.setRequestMethod("POST");
+        con.setRequestProperty("Content-Type","application/json");
 
         Map<String, String> parameters = new HashMap<>();
         parameters.put("email", "eve.holt@reqres.in");
@@ -40,12 +42,36 @@ public class TestsApi {
 
     @Test
     public void testAutenticacaoCredenciaisInvalidas() throws IOException {
-        URL url = new URL("https://reqres.in/api/login/");
+        URL url = new URL("https://reqres.in/api/login");
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         con.setRequestMethod("POST");
+        con.setRequestProperty("Content-Type","application/json");
 
         Map<String, String> parameters = new HashMap<>();
         parameters.put("email", "teste@mail.com");
+        parameters.put("password", "cityslicka");
+
+        con.setDoOutput(true);
+        DataOutputStream out = new DataOutputStream(con.getOutputStream());
+        out.writeBytes(ParameterStringBuilder.getParamsString(parameters));
+        out.flush();
+        out.close();
+
+        int status = con.getResponseCode();
+        con.disconnect();
+
+        assertEquals(401, status);
+    }
+
+    @Test
+    public void testAutenticacaoEmailFormatoInvalido() throws IOException {
+        URL url = new URL("https://reqres.in/api/login");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("POST");
+        con.setRequestProperty("Content-Type","application/json");
+
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("email", "testemail.com");
         parameters.put("password", "cityslicka");
 
         con.setDoOutput(true);
@@ -61,12 +87,15 @@ public class TestsApi {
     }
 
     @Test
-    public void testAutenticacaoSemCampos() throws IOException {
-        URL url = new URL("https://reqres.in/api/login/");
+    public void testAutenticacaoEmailLimiteInferior() throws IOException {
+        URL url = new URL("https://reqres.in/api/login");
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         con.setRequestMethod("POST");
+        con.setRequestProperty("Content-Type","application/json");
 
         Map<String, String> parameters = new HashMap<>();
+        parameters.put("email", "a@es.in");
+        parameters.put("password", "cityslicka");
 
         con.setDoOutput(true);
         DataOutputStream out = new DataOutputStream(con.getOutputStream());
@@ -81,14 +110,15 @@ public class TestsApi {
     }
 
     @Test
-    public void testAutenticacaoSemEmail() throws IOException {
-        URL url = new URL("https://reqres.in/api/login/");
+    public void testAutenticacaoEmailLimiteSuperior() throws IOException {
+        URL url = new URL("https://reqres.in/api/login");
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         con.setRequestMethod("POST");
+        con.setRequestProperty("Content-Type","application/json");
 
         Map<String, String> parameters = new HashMap<>();
-        parameters.put("password", "eve.holt@reqres.in");
-
+        parameters.put("email", "asdzxcqwsadertfgvbfcd@reqres.in");
+        parameters.put("password", "cityslicka");
 
         con.setDoOutput(true);
         DataOutputStream out = new DataOutputStream(con.getOutputStream());
@@ -103,14 +133,61 @@ public class TestsApi {
     }
 
     @Test
-    public void testAutenticacaoSemPassword() throws IOException {
-        URL url = new URL("https://reqres.in/api/login/");
+    public void testAutenticacaoEmailLimiteMinimo() throws IOException {
+        URL url = new URL("https://reqres.in/api/login");
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         con.setRequestMethod("POST");
+        con.setRequestProperty("Content-Type","application/json");
+
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("email", "qwerty@reqres.in");
+        parameters.put("password", "cityslicka");
+
+        con.setDoOutput(true);
+        DataOutputStream out = new DataOutputStream(con.getOutputStream());
+        out.writeBytes(ParameterStringBuilder.getParamsString(parameters));
+        out.flush();
+        out.close();
+
+        int status = con.getResponseCode();
+        con.disconnect();
+
+        assertEquals(200, status);
+    }
+
+    @Test
+    public void testAutenticacaoEmailLimiteMaximo() throws IOException {
+        URL url = new URL("https://reqres.in/api/login");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("POST");
+        con.setRequestProperty("Content-Type","application/json");
+
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("email", "asdzxcqwsadertfgvbfc@reqres.in");
+        parameters.put("password", "cityslicka");
+
+        con.setDoOutput(true);
+        DataOutputStream out = new DataOutputStream(con.getOutputStream());
+        out.writeBytes(ParameterStringBuilder.getParamsString(parameters));
+        out.flush();
+        out.close();
+
+        int status = con.getResponseCode();
+        con.disconnect();
+
+        assertEquals(200, status);
+    }
+
+    @Test
+    public void testAutenticacaoPasswordLimiteInferior() throws IOException {
+        URL url = new URL("https://reqres.in/api/login");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("POST");
+        con.setRequestProperty("Content-Type","application/json");
 
         Map<String, String> parameters = new HashMap<>();
         parameters.put("email", "eve.holt@reqres.in");
-
+        parameters.put("password", "12345");
 
         con.setDoOutput(true);
         DataOutputStream out = new DataOutputStream(con.getOutputStream());
@@ -125,15 +202,222 @@ public class TestsApi {
     }
 
     @Test
-    public void testAutenticacaoCamposNomesInvalidos() throws IOException {
-        URL url = new URL("https://reqres.in/api/login/");
+    public void testAutenticacaoPasswordLimiteSuperior() throws IOException {
+        URL url = new URL("https://reqres.in/api/login");
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         con.setRequestMethod("POST");
+        con.setRequestProperty("Content-Type","application/json");
+
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("email", "eve.holt@reqres.in");
+        parameters.put("password", "passwordtest123456789");
+
+        con.setDoOutput(true);
+        DataOutputStream out = new DataOutputStream(con.getOutputStream());
+        out.writeBytes(ParameterStringBuilder.getParamsString(parameters));
+        out.flush();
+        out.close();
+
+        int status = con.getResponseCode();
+        con.disconnect();
+
+        assertEquals(400, status);
+    }
+
+    @Test
+    public void testAutenticacaoPasswordLimiteMinimo() throws IOException {
+        URL url = new URL("https://reqres.in/api/login");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("POST");
+        con.setRequestProperty("Content-Type","application/json");
+
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("email", "eve.holt@reqres.in");
+        parameters.put("password", "123456");
+
+        con.setDoOutput(true);
+        DataOutputStream out = new DataOutputStream(con.getOutputStream());
+        out.writeBytes(ParameterStringBuilder.getParamsString(parameters));
+        out.flush();
+        out.close();
+
+        int status = con.getResponseCode();
+        con.disconnect();
+
+        assertEquals(200, status);
+    }
+
+    @Test
+    public void testAutenticacaoPasswordLimiteMaximo() throws IOException {
+        URL url = new URL("https://reqres.in/api/login");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("POST");
+        con.setRequestProperty("Content-Type","application/json");
+
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("email", "eve.holt@reqres.in");
+        parameters.put("password", "passwordtest12345678");
+
+        con.setDoOutput(true);
+        DataOutputStream out = new DataOutputStream(con.getOutputStream());
+        out.writeBytes(ParameterStringBuilder.getParamsString(parameters));
+        out.flush();
+        out.close();
+
+        int status = con.getResponseCode();
+        con.disconnect();
+
+        assertEquals(200, status);
+    }
+
+    @Test
+    public void testAutenticacaoEmailNull() throws IOException {
+        URL url = new URL("https://reqres.in/api/login");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("POST");
+        con.setRequestProperty("Content-Type","application/json");
+
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("email", null);
+        parameters.put("password", "cityslicka");
+
+        con.setDoOutput(true);
+        DataOutputStream out = new DataOutputStream(con.getOutputStream());
+        out.writeBytes(ParameterStringBuilder.getParamsString(parameters));
+        out.flush();
+        out.close();
+
+        int status = con.getResponseCode();
+        con.disconnect();
+
+        assertEquals(400, status);
+    }
+
+    @Test
+    public void testAutenticacaoPasswordNull() throws IOException {
+        URL url = new URL("https://reqres.in/api/login");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("POST");
+        con.setRequestProperty("Content-Type","application/json");
+
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("email", "eve.holt@reqres.in");
+        parameters.put("password", null);
+
+        con.setDoOutput(true);
+        DataOutputStream out = new DataOutputStream(con.getOutputStream());
+        out.writeBytes(ParameterStringBuilder.getParamsString(parameters));
+        out.flush();
+        out.close();
+
+        int status = con.getResponseCode();
+        con.disconnect();
+
+        assertEquals(400, status);
+    }
+
+    @Test
+    public void testAutenticacaoEmailPasswordNull() throws IOException {
+        URL url = new URL("https://reqres.in/api/login");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("POST");
+        con.setRequestProperty("Content-Type","application/json");
+
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("email", null);
+        parameters.put("password", null);
+
+        con.setDoOutput(true);
+        DataOutputStream out = new DataOutputStream(con.getOutputStream());
+        out.writeBytes(ParameterStringBuilder.getParamsString(parameters));
+        out.flush();
+        out.close();
+
+        int status = con.getResponseCode();
+        con.disconnect();
+
+        assertEquals(400, status);
+    }
+
+    @Test
+    public void testAutenticacaoEmailVazio() throws IOException {
+        URL url = new URL("https://reqres.in/api/login");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("POST");
+        con.setRequestProperty("Content-Type","application/json");
+
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("email", "");
+        parameters.put("password", "cityslicka");
+
+        con.setDoOutput(true);
+        DataOutputStream out = new DataOutputStream(con.getOutputStream());
+        out.writeBytes(ParameterStringBuilder.getParamsString(parameters));
+        out.flush();
+        out.close();
+
+        int status = con.getResponseCode();
+        con.disconnect();
+
+        assertEquals(400, status);
+    }
+
+    @Test
+    public void testAutenticacaoPasswordVazia() throws IOException {
+        URL url = new URL("https://reqres.in/api/login");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("POST");
+        con.setRequestProperty("Content-Type","application/json");
+
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("email", "eve.holt@reqres.in");
+        parameters.put("password", "");
+
+        con.setDoOutput(true);
+        DataOutputStream out = new DataOutputStream(con.getOutputStream());
+        out.writeBytes(ParameterStringBuilder.getParamsString(parameters));
+        out.flush();
+        out.close();
+
+        int status = con.getResponseCode();
+        con.disconnect();
+
+        assertEquals(400, status);
+    }
+
+    @Test
+    public void testAutenticacaoEmailPasswordVazios() throws IOException {
+        URL url = new URL("https://reqres.in/api/login");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("POST");
+        con.setRequestProperty("Content-Type","application/json");
+
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("email", "");
+        parameters.put("password", "");
+
+        con.setDoOutput(true);
+        DataOutputStream out = new DataOutputStream(con.getOutputStream());
+        out.writeBytes(ParameterStringBuilder.getParamsString(parameters));
+        out.flush();
+        out.close();
+
+        int status = con.getResponseCode();
+        con.disconnect();
+
+        assertEquals(400, status);
+    }
+
+    @Test
+    public void testAutenticacaoCampoEmailInvalido() throws IOException {
+        URL url = new URL("https://reqres.in/api/login");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("POST");
+        con.setRequestProperty("Content-Type","application/json");
 
         Map<String, String> parameters = new HashMap<>();
         parameters.put("emailx", "eve.holt@reqres.in");
-        parameters.put("passwordx", "cityslicka");
-
+        parameters.put("password", "cityslicka");
 
         con.setDoOutput(true);
         DataOutputStream out = new DataOutputStream(con.getOutputStream());
@@ -148,21 +432,15 @@ public class TestsApi {
     }
 
     @Test
-    public void testAutenticacaoParametrosGrandes() throws IOException {
-        URL url = new URL("https://reqres.in/api/login/");
+    public void testAutenticacaoCampoPasswordInvalido() throws IOException {
+        URL url = new URL("https://reqres.in/api/login");
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         con.setRequestMethod("POST");
+        con.setRequestProperty("Content-Type","application/json");
 
         Map<String, String> parameters = new HashMap<>();
-        String email = "";
-        for (int i = 0; i < 99999; i++)
-            email+=("eve.holt@reqres.in");
         parameters.put("email", "eve.holt@reqres.in");
-
-        String password = "";
-        for (int i = 0; i < 99999; i++)
-            password+=("cityslicka");
-        parameters.put("job", password);
+        parameters.put("passwordx", "cityslicka");
 
         con.setDoOutput(true);
         DataOutputStream out = new DataOutputStream(con.getOutputStream());
@@ -173,17 +451,104 @@ public class TestsApi {
         int status = con.getResponseCode();
         con.disconnect();
 
-        assertEquals(413, status);
+        assertEquals(400, status);
     }
+
+    @Test
+    public void testAutenticacaoContentTypeInvalido() throws IOException {
+        URL url = new URL("https://reqres.in/api/login");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("POST");
+        con.setRequestProperty("Content-Type","application/xml");
+
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("email", "eve.holt@reqres.in");
+        parameters.put("password", "cityslicka");
+
+        con.setDoOutput(true);
+        DataOutputStream out = new DataOutputStream(con.getOutputStream());
+        out.writeBytes(ParameterStringBuilder.getParamsString(parameters));
+        out.flush();
+        out.close();
+
+        int status = con.getResponseCode();
+        con.disconnect();
+
+        assertEquals(400, status);
+    }
+
+    @Test
+    public void testAutenticacaoMetodoGET() throws IOException {
+        URL url = new URL("https://reqres.in/api/login");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("GET");
+        con.setRequestProperty("Content-Type","application/json");
+
+        int status = con.getResponseCode();
+        con.disconnect();
+
+        assertEquals(405, status);
+    }
+
+    @Test
+    public void testAutenticacaoMetodoPUT() throws IOException {
+        URL url = new URL("https://reqres.in/api/login");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("PUT");
+        con.setRequestProperty("Content-Type","application/json");
+
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("email", "eve.holt@reqres.in");
+        parameters.put("password", "cityslicka");
+
+        con.setDoOutput(true);
+        DataOutputStream out = new DataOutputStream(con.getOutputStream());
+        out.writeBytes(ParameterStringBuilder.getParamsString(parameters));
+        out.flush();
+        out.close();
+
+        int status = con.getResponseCode();
+        con.disconnect();
+
+        assertEquals(405, status);
+    }
+
+    @Test
+    public void testAutenticacaoMetodoDELETE() throws IOException {
+        URL url = new URL("https://reqres.in/api/login");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("DELETE");
+        con.setRequestProperty("Content-Type","application/json");
+
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("email", "eve.holt@reqres.in");
+        parameters.put("password", "cityslicka");
+
+        con.setDoOutput(true);
+        DataOutputStream out = new DataOutputStream(con.getOutputStream());
+        out.writeBytes(ParameterStringBuilder.getParamsString(parameters));
+        out.flush();
+        out.close();
+
+        int status = con.getResponseCode();
+        con.disconnect();
+
+        assertEquals(405, status);
+    }
+
+
+
+
 
 
 
     //testes registo
     @Test
     public void testRegistoSucesso() throws IOException {
-        URL url = new URL("https://reqres.in/api/register/");
+        URL url = new URL("https://reqres.in/api/register");
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         con.setRequestMethod("POST");
+        con.setRequestProperty("Content-Type","application/json");
 
         Map<String, String> parameters = new HashMap<>();
         parameters.put("email", "eve.holt@reqres.in");
@@ -202,13 +567,14 @@ public class TestsApi {
     }
 
     @Test
-    public void testRegistoEmailNaoRegistado() throws IOException {
+    public void testRegistoEmailContaNaoCriada() throws IOException {
         URL url = new URL("https://reqres.in/api/register");
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         con.setRequestMethod("POST");
+        con.setRequestProperty("Content-Type","application/json");
 
         Map<String, String> parameters = new HashMap<>();
-        parameters.put("email","teste@mail.com");
+        parameters.put("email", "test@reqres.in");
         parameters.put("password", "pistol");
 
         con.setDoOutput(true);
@@ -224,56 +590,38 @@ public class TestsApi {
     }
 
     @Test
-    public void testRegistoSemCampos() throws IOException {
-        URL url = new URL("https://reqres.in/api/register/");
+    public void testRegistoEmailContaJaRegistada() throws IOException {
+        URL url = new URL("https://reqres.in/api/register");
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         con.setRequestMethod("POST");
-
-        Map<String, String> parameters = new HashMap<>();
-
-        con.setDoOutput(true);
-        DataOutputStream out = new DataOutputStream(con.getOutputStream());
-        out.writeBytes(ParameterStringBuilder.getParamsString(parameters));
-        out.flush();
-        out.close();
-
-        int status = con.getResponseCode();
-        con.disconnect();
-
-        assertEquals(400, status);
-    }
-
-    @Test
-    public void testRegistoSemEmail() throws IOException {
-        URL url = new URL("https://reqres.in/api/register/");
-        HttpURLConnection con = (HttpURLConnection) url.openConnection();
-        con.setRequestMethod("POST");
-
-        Map<String, String> parameters = new HashMap<>();
-        parameters.put("password", "eve.holt@reqres.in");
-
-
-        con.setDoOutput(true);
-        DataOutputStream out = new DataOutputStream(con.getOutputStream());
-        out.writeBytes(ParameterStringBuilder.getParamsString(parameters));
-        out.flush();
-        out.close();
-
-        int status = con.getResponseCode();
-        con.disconnect();
-
-        assertEquals(400, status);
-    }
-
-    @Test
-    public void testRegistoSemPassword() throws IOException {
-        URL url = new URL("https://reqres.in/api/register/");
-        HttpURLConnection con = (HttpURLConnection) url.openConnection();
-        con.setRequestMethod("POST");
+        con.setRequestProperty("Content-Type","application/json");
 
         Map<String, String> parameters = new HashMap<>();
         parameters.put("email", "eve.holt@reqres.in");
+        parameters.put("password", "pistol");
 
+        con.setDoOutput(true);
+        DataOutputStream out = new DataOutputStream(con.getOutputStream());
+        out.writeBytes(ParameterStringBuilder.getParamsString(parameters));
+        out.flush();
+        out.close();
+
+        int status = con.getResponseCode();
+        con.disconnect();
+
+        assertEquals(409, status);
+    }
+
+    @Test
+    public void testRegistoEmailFormatoInvalido() throws IOException {
+        URL url = new URL("https://reqres.in/api/register");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("POST");
+        con.setRequestProperty("Content-Type","application/json");
+
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("email", "testemail.com");
+        parameters.put("password", "cityslicka");
 
         con.setDoOutput(true);
         DataOutputStream out = new DataOutputStream(con.getOutputStream());
@@ -288,15 +636,337 @@ public class TestsApi {
     }
 
     @Test
-    public void testRegistoCamposNomesInvalidos() throws IOException {
-        URL url = new URL("https://reqres.in/api/register/");
+    public void testRegistoEmailLimiteInferior() throws IOException {
+        URL url = new URL("https://reqres.in/api/register");
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         con.setRequestMethod("POST");
+        con.setRequestProperty("Content-Type","application/json");
+
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("email", "a@es.in");
+        parameters.put("password", "cityslicka");
+
+        con.setDoOutput(true);
+        DataOutputStream out = new DataOutputStream(con.getOutputStream());
+        out.writeBytes(ParameterStringBuilder.getParamsString(parameters));
+        out.flush();
+        out.close();
+
+        int status = con.getResponseCode();
+        con.disconnect();
+
+        assertEquals(400, status);
+    }
+
+    @Test
+    public void testRegistoEmailLimiteSuperior() throws IOException {
+        URL url = new URL("https://reqres.in/api/register");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("POST");
+        con.setRequestProperty("Content-Type","application/json");
+
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("email", "asdzxcqwsadertfgvbfcd@reqres.in");
+        parameters.put("password", "cityslicka");
+
+        con.setDoOutput(true);
+        DataOutputStream out = new DataOutputStream(con.getOutputStream());
+        out.writeBytes(ParameterStringBuilder.getParamsString(parameters));
+        out.flush();
+        out.close();
+
+        int status = con.getResponseCode();
+        con.disconnect();
+
+        assertEquals(400, status);
+    }
+
+    @Test
+    public void testRegistoEmailLimiteMinimo() throws IOException {
+        URL url = new URL("https://reqres.in/api/register");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("POST");
+        con.setRequestProperty("Content-Type","application/json");
+
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("email", "qwerty@reqres.in");
+        parameters.put("password", "cityslicka");
+
+        con.setDoOutput(true);
+        DataOutputStream out = new DataOutputStream(con.getOutputStream());
+        out.writeBytes(ParameterStringBuilder.getParamsString(parameters));
+        out.flush();
+        out.close();
+
+        int status = con.getResponseCode();
+        con.disconnect();
+
+        assertEquals(200, status);
+    }
+
+    @Test
+    public void testRegistoEmailLimiteMaximo() throws IOException {
+        URL url = new URL("https://reqres.in/api/register");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("POST");
+        con.setRequestProperty("Content-Type","application/json");
+
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("email", "asdzxcqwsadertfgvbfc@reqres.in");
+        parameters.put("password", "cityslicka");
+
+        con.setDoOutput(true);
+        DataOutputStream out = new DataOutputStream(con.getOutputStream());
+        out.writeBytes(ParameterStringBuilder.getParamsString(parameters));
+        out.flush();
+        out.close();
+
+        int status = con.getResponseCode();
+        con.disconnect();
+
+        assertEquals(200, status);
+    }
+
+    @Test
+    public void testRegistoPasswordLimiteInferior() throws IOException {
+        URL url = new URL("https://reqres.in/api/register");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("POST");
+        con.setRequestProperty("Content-Type","application/json");
+
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("email", "eve.holt@reqres.in");
+        parameters.put("password", "12345");
+
+        con.setDoOutput(true);
+        DataOutputStream out = new DataOutputStream(con.getOutputStream());
+        out.writeBytes(ParameterStringBuilder.getParamsString(parameters));
+        out.flush();
+        out.close();
+
+        int status = con.getResponseCode();
+        con.disconnect();
+
+        assertEquals(400, status);
+    }
+
+    @Test
+    public void testRegistoPasswordLimiteSuperior() throws IOException {
+        URL url = new URL("https://reqres.in/api/register");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("POST");
+        con.setRequestProperty("Content-Type","application/json");
+
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("email", "eve.holt@reqres.in");
+        parameters.put("password", "passwordtest123456789");
+
+        con.setDoOutput(true);
+        DataOutputStream out = new DataOutputStream(con.getOutputStream());
+        out.writeBytes(ParameterStringBuilder.getParamsString(parameters));
+        out.flush();
+        out.close();
+
+        int status = con.getResponseCode();
+        con.disconnect();
+
+        assertEquals(400, status);
+    }
+
+    @Test
+    public void testRegistoPasswordLimiteMinimo() throws IOException {
+        URL url = new URL("https://reqres.in/api/register");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("POST");
+        con.setRequestProperty("Content-Type","application/json");
+
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("email", "eve.holt@reqres.in");
+        parameters.put("password", "123456");
+
+        con.setDoOutput(true);
+        DataOutputStream out = new DataOutputStream(con.getOutputStream());
+        out.writeBytes(ParameterStringBuilder.getParamsString(parameters));
+        out.flush();
+        out.close();
+
+        int status = con.getResponseCode();
+        con.disconnect();
+
+        assertEquals(200, status);
+    }
+
+    @Test
+    public void testRegistoPasswordLimiteMaximo() throws IOException {
+        URL url = new URL("https://reqres.in/api/register");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("POST");
+        con.setRequestProperty("Content-Type","application/json");
+
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("email", "eve.holt@reqres.in");
+        parameters.put("password", "passwordtest12345678");
+
+        con.setDoOutput(true);
+        DataOutputStream out = new DataOutputStream(con.getOutputStream());
+        out.writeBytes(ParameterStringBuilder.getParamsString(parameters));
+        out.flush();
+        out.close();
+
+        int status = con.getResponseCode();
+        con.disconnect();
+
+        assertEquals(200, status);
+    }
+
+    @Test
+    public void testRegistoEmailNull() throws IOException {
+        URL url = new URL("https://reqres.in/api/register");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("POST");
+        con.setRequestProperty("Content-Type","application/json");
+
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("email", null);
+        parameters.put("password", "cityslicka");
+
+        con.setDoOutput(true);
+        DataOutputStream out = new DataOutputStream(con.getOutputStream());
+        out.writeBytes(ParameterStringBuilder.getParamsString(parameters));
+        out.flush();
+        out.close();
+
+        int status = con.getResponseCode();
+        con.disconnect();
+
+        assertEquals(400, status);
+    }
+
+    @Test
+    public void testRegistoPasswordNull() throws IOException {
+        URL url = new URL("https://reqres.in/api/register");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("POST");
+        con.setRequestProperty("Content-Type","application/json");
+
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("email", "eve.holt@reqres.in");
+        parameters.put("password", null);
+
+        con.setDoOutput(true);
+        DataOutputStream out = new DataOutputStream(con.getOutputStream());
+        out.writeBytes(ParameterStringBuilder.getParamsString(parameters));
+        out.flush();
+        out.close();
+
+        int status = con.getResponseCode();
+        con.disconnect();
+
+        assertEquals(400, status);
+    }
+
+    @Test
+    public void testRegistoEmailPasswordNull() throws IOException {
+        URL url = new URL("https://reqres.in/api/register");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("POST");
+        con.setRequestProperty("Content-Type","application/json");
+
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("email", null);
+        parameters.put("password", null);
+
+        con.setDoOutput(true);
+        DataOutputStream out = new DataOutputStream(con.getOutputStream());
+        out.writeBytes(ParameterStringBuilder.getParamsString(parameters));
+        out.flush();
+        out.close();
+
+        int status = con.getResponseCode();
+        con.disconnect();
+
+        assertEquals(400, status);
+    }
+
+    @Test
+    public void testRegistoEmailVazio() throws IOException {
+        URL url = new URL("https://reqres.in/api/register");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("POST");
+        con.setRequestProperty("Content-Type","application/json");
+
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("email", "");
+        parameters.put("password", "cityslicka");
+
+        con.setDoOutput(true);
+        DataOutputStream out = new DataOutputStream(con.getOutputStream());
+        out.writeBytes(ParameterStringBuilder.getParamsString(parameters));
+        out.flush();
+        out.close();
+
+        int status = con.getResponseCode();
+        con.disconnect();
+
+        assertEquals(400, status);
+    }
+
+    @Test
+    public void testRegistoPasswordVazia() throws IOException {
+        URL url = new URL("https://reqres.in/api/register");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("POST");
+        con.setRequestProperty("Content-Type","application/json");
+
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("email", "eve.holt@reqres.in");
+        parameters.put("password", "");
+
+        con.setDoOutput(true);
+        DataOutputStream out = new DataOutputStream(con.getOutputStream());
+        out.writeBytes(ParameterStringBuilder.getParamsString(parameters));
+        out.flush();
+        out.close();
+
+        int status = con.getResponseCode();
+        con.disconnect();
+
+        assertEquals(400, status);
+    }
+
+    @Test
+    public void testRegistoEmailPasswordVazios() throws IOException {
+        URL url = new URL("https://reqres.in/api/register");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("POST");
+        con.setRequestProperty("Content-Type","application/json");
+
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("email", "");
+        parameters.put("password", "");
+
+        con.setDoOutput(true);
+        DataOutputStream out = new DataOutputStream(con.getOutputStream());
+        out.writeBytes(ParameterStringBuilder.getParamsString(parameters));
+        out.flush();
+        out.close();
+
+        int status = con.getResponseCode();
+        con.disconnect();
+
+        assertEquals(400, status);
+    }
+
+    @Test
+    public void testRegistoCampoEmailInvalido() throws IOException {
+        URL url = new URL("https://reqres.in/api/register");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("POST");
+        con.setRequestProperty("Content-Type","application/json");
 
         Map<String, String> parameters = new HashMap<>();
         parameters.put("emailx", "eve.holt@reqres.in");
-        parameters.put("passwordx", "cityslicka");
-
+        parameters.put("password", "cityslicka");
 
         con.setDoOutput(true);
         DataOutputStream out = new DataOutputStream(con.getOutputStream());
@@ -311,21 +981,15 @@ public class TestsApi {
     }
 
     @Test
-    public void testRegistoParametrosGrandes() throws IOException {
-        URL url = new URL("https://reqres.in/api/register/");
+    public void testRegistoCampoPasswordInvalido() throws IOException {
+        URL url = new URL("https://reqres.in/api/register");
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         con.setRequestMethod("POST");
+        con.setRequestProperty("Content-Type","application/json");
 
         Map<String, String> parameters = new HashMap<>();
-        String email = "";
-        for (int i = 0; i < 99999; i++)
-            email+=("eve.holt@reqres.in");
         parameters.put("email", "eve.holt@reqres.in");
-
-        String password = "";
-        for (int i = 0; i < 99999; i++)
-            password+=("cityslicka");
-        parameters.put("job", password);
+        parameters.put("passwordx", "cityslicka");
 
         con.setDoOutput(true);
         DataOutputStream out = new DataOutputStream(con.getOutputStream());
@@ -336,21 +1000,117 @@ public class TestsApi {
         int status = con.getResponseCode();
         con.disconnect();
 
-        assertEquals(413, status);
+        assertEquals(400, status);
     }
+
+    @Test
+    public void testRegistoContentTypeInvalido() throws IOException {
+        URL url = new URL("https://reqres.in/api/register");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("POST");
+        con.setRequestProperty("Content-Type","application/xml");
+
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("email", "eve.holt@reqres.in");
+        parameters.put("password", "cityslicka");
+
+        con.setDoOutput(true);
+        DataOutputStream out = new DataOutputStream(con.getOutputStream());
+        out.writeBytes(ParameterStringBuilder.getParamsString(parameters));
+        out.flush();
+        out.close();
+
+        int status = con.getResponseCode();
+        con.disconnect();
+
+        assertEquals(400, status);
+    }
+
+    @Test
+    public void testRegistoMetodoGET() throws IOException {
+        URL url = new URL("https://reqres.in/api/login");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("GET");
+        con.setRequestProperty("Content-Type","application/json");
+
+        int status = con.getResponseCode();
+        con.disconnect();
+
+        assertEquals(405, status);
+    }
+
+    @Test
+    public void testRegistoMetodoPUT() throws IOException {
+        URL url = new URL("https://reqres.in/api/login");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("PUT");
+        con.setRequestProperty("Content-Type","application/json");
+
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("email", "eve.holt@reqres.in");
+        parameters.put("password", "cityslicka");
+
+        con.setDoOutput(true);
+        DataOutputStream out = new DataOutputStream(con.getOutputStream());
+        out.writeBytes(ParameterStringBuilder.getParamsString(parameters));
+        out.flush();
+        out.close();
+
+        int status = con.getResponseCode();
+        con.disconnect();
+
+        assertEquals(405, status);
+    }
+
+    @Test
+    public void testRegistoMetodoDELETE() throws IOException {
+        URL url = new URL("https://reqres.in/api/login");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("DELETE");
+        con.setRequestProperty("Content-Type","application/json");
+
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("email", "eve.holt@reqres.in");
+        parameters.put("password", "cityslicka");
+
+        con.setDoOutput(true);
+        DataOutputStream out = new DataOutputStream(con.getOutputStream());
+        out.writeBytes(ParameterStringBuilder.getParamsString(parameters));
+        out.flush();
+        out.close();
+
+        int status = con.getResponseCode();
+        con.disconnect();
+
+        assertEquals(405, status);
+    }
+
+
+
+
+
+
+
+
+
 
 
 
     //testes criar utilizador
     @Test
     public void testCriarUtilizadorSucesso() throws IOException {
-        URL url = new URL("https://reqres.in/api/users/");
+        URL url = new URL("https://reqres.in/api/users");
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         con.setRequestMethod("POST");
+        con.setRequestProperty("Content-Type","application/json");
+        con.setRequestProperty("Authorization","QpwL5tke4Pnpja7X4");
 
         Map<String, String> parameters = new HashMap<>();
-        parameters.put("name", "morpheus");
-        parameters.put("job", "leader");
+        parameters.put("email", "test@reqres.in");
+        parameters.put("first_name", "John");
+        parameters.put("last_name", "Doe");
+        parameters.put("avatar", "rgergeegrerre.jpg");
+
 
         con.setDoOutput(true);
         DataOutputStream out = new DataOutputStream(con.getOutputStream());
@@ -365,21 +1125,18 @@ public class TestsApi {
     }
 
     @Test
-    public void testCriarUtilizadorParametrosGrandes() throws IOException {
-        URL url = new URL("https://reqres.in/api/users/");
+    public void testCriarUtilizadorJaExistente() throws IOException {
+        URL url = new URL("https://reqres.in/api/users");
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         con.setRequestMethod("POST");
+        con.setRequestProperty("Content-Type","application/json");
+        con.setRequestProperty("Authorization","QpwL5tke4Pnpja7X4");
 
         Map<String, String> parameters = new HashMap<>();
-        String name = "";
-        for (int i = 0; i < 99999; i++)
-            name+=("morpheus");
-        parameters.put("name", name);
-
-        String job = "";
-        for (int i = 0; i < 99999; i++)
-            job+=("leader");
-        parameters.put("job", job);
+        parameters.put("email", "eve.holt@reqres.in");
+        parameters.put("first_name", "John");
+        parameters.put("last_name", "Doe");
+        parameters.put("avatar", "rgergeegrerre.jpg");
 
         con.setDoOutput(true);
         DataOutputStream out = new DataOutputStream(con.getOutputStream());
@@ -390,21 +1147,314 @@ public class TestsApi {
         int status = con.getResponseCode();
         con.disconnect();
 
-        assertEquals(413, status);
+        assertEquals(409, status);
     }
+
+    @Test
+    public void testCriarUtilizadorEmailFormatoInvalido() throws IOException {
+        URL url = new URL("https://reqres.in/api/users");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("POST");
+        con.setRequestProperty("Content-Type","application/json");
+        con.setRequestProperty("Authorization","QpwL5tke4Pnpja7X4");
+
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("email", "testreqres.in");
+        parameters.put("first_name", "John");
+        parameters.put("last_name", "Doe");
+        parameters.put("avatar", "rgergeegrerre.jpg");
+
+        con.setDoOutput(true);
+        DataOutputStream out = new DataOutputStream(con.getOutputStream());
+        out.writeBytes(ParameterStringBuilder.getParamsString(parameters));
+        out.flush();
+        out.close();
+
+        int status = con.getResponseCode();
+        con.disconnect();
+
+        assertEquals(400, status);
+    }
+
+    @Test
+    public void testCriarUtilizadorEmailLimiteInferior() throws IOException {
+        URL url = new URL("https://reqres.in/api/users");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("POST");
+        con.setRequestProperty("Content-Type","application/json");
+        con.setRequestProperty("Authorization","QpwL5tke4Pnpja7X4");
+
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("email", "a@es.in");
+        parameters.put("first_name", "John");
+        parameters.put("last_name", "Doe");
+        parameters.put("avatar", "rgergeegrerre.jpg");
+
+        con.setDoOutput(true);
+        DataOutputStream out = new DataOutputStream(con.getOutputStream());
+        out.writeBytes(ParameterStringBuilder.getParamsString(parameters));
+        out.flush();
+        out.close();
+
+        int status = con.getResponseCode();
+        con.disconnect();
+
+        assertEquals(400, status);
+    }
+
+    @Test
+    public void testCriarUtilizadorEmailLimiteSuperior() throws IOException {
+        URL url = new URL("https://reqres.in/api/users");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("POST");
+        con.setRequestProperty("Content-Type","application/json");
+        con.setRequestProperty("Authorization","QpwL5tke4Pnpja7X4");
+
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("email", "asdzxcqwsadertfgvbfcd@reqres.in");
+        parameters.put("first_name", "John");
+        parameters.put("last_name", "Doe");
+        parameters.put("avatar", "rgergeegrerre.jpg");
+
+        con.setDoOutput(true);
+        DataOutputStream out = new DataOutputStream(con.getOutputStream());
+        out.writeBytes(ParameterStringBuilder.getParamsString(parameters));
+        out.flush();
+        out.close();
+
+        int status = con.getResponseCode();
+        con.disconnect();
+
+        assertEquals(400, status);
+    }
+
+    @Test
+    public void testCriarUtilizadorEmailLimiteMinimo() throws IOException {
+        URL url = new URL("https://reqres.in/api/users");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("POST");
+        con.setRequestProperty("Content-Type","application/json");
+        con.setRequestProperty("Authorization","QpwL5tke4Pnpja7X4");
+
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("email", "qwerty@reqres.in");
+        parameters.put("first_name", "John");
+        parameters.put("last_name", "Doe");
+        parameters.put("avatar", "rgergeegrerre.jpg");
+
+        con.setDoOutput(true);
+        DataOutputStream out = new DataOutputStream(con.getOutputStream());
+        out.writeBytes(ParameterStringBuilder.getParamsString(parameters));
+        out.flush();
+        out.close();
+
+        int status = con.getResponseCode();
+        con.disconnect();
+
+        assertEquals(400, status);
+    }
+
+    @Test
+    public void testCriarUtilizadorEmailLimiteMaximo() throws IOException {
+        URL url = new URL("https://reqres.in/api/users");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("POST");
+        con.setRequestProperty("Content-Type","application/json");
+        con.setRequestProperty("Authorization","QpwL5tke4Pnpja7X4");
+
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("email", "asdzxcqwsadertfgvbfc@reqres.in");
+        parameters.put("first_name", "John");
+        parameters.put("last_name", "Doe");
+        parameters.put("avatar", "rgergeegrerre.jpg");
+
+        con.setDoOutput(true);
+        DataOutputStream out = new DataOutputStream(con.getOutputStream());
+        out.writeBytes(ParameterStringBuilder.getParamsString(parameters));
+        out.flush();
+        out.close();
+
+        int status = con.getResponseCode();
+        con.disconnect();
+
+        assertEquals(400, status);
+    }
+
+    @Test
+    public void testCriarUtilizadorEmailVazio() throws IOException {
+        URL url = new URL("https://reqres.in/api/users");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("POST");
+        con.setRequestProperty("Content-Type","application/json");
+        con.setRequestProperty("Authorization","QpwL5tke4Pnpja7X4");
+
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("email", "");
+        parameters.put("first_name", "John");
+        parameters.put("last_name", "Doe");
+        parameters.put("avatar", "rgergeegrerre.jpg");
+
+        con.setDoOutput(true);
+        DataOutputStream out = new DataOutputStream(con.getOutputStream());
+        out.writeBytes(ParameterStringBuilder.getParamsString(parameters));
+        out.flush();
+        out.close();
+
+        int status = con.getResponseCode();
+        con.disconnect();
+
+        assertEquals(400, status);
+    }
+
+    @Test
+    public void testCriarUtilizadorEmailNull() throws IOException {
+        URL url = new URL("https://reqres.in/api/users");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("POST");
+        con.setRequestProperty("Content-Type","application/json");
+        con.setRequestProperty("Authorization","QpwL5tke4Pnpja7X4");
+
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("email", null);
+        parameters.put("first_name", "John");
+        parameters.put("last_name", "Doe");
+        parameters.put("avatar", "rgergeegrerre.jpg");
+
+        con.setDoOutput(true);
+        DataOutputStream out = new DataOutputStream(con.getOutputStream());
+        out.writeBytes(ParameterStringBuilder.getParamsString(parameters));
+        out.flush();
+        out.close();
+
+        int status = con.getResponseCode();
+        con.disconnect();
+
+        assertEquals(400, status);
+    }
+
+    @Test
+    public void testCriarUtilizadorContentTypeInvalido() throws IOException {
+        URL url = new URL("https://reqres.in/api/users");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("POST");
+        con.setRequestProperty("Content-Type","application/xml");
+        con.setRequestProperty("Authorization","QpwL5tke4Pnpja7X4");
+
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("email", "test@reqres.in");
+        parameters.put("first_name", "John");
+        parameters.put("last_name", "Doe");
+        parameters.put("avatar", "rgergeegrerre.jpg");
+
+        con.setDoOutput(true);
+        DataOutputStream out = new DataOutputStream(con.getOutputStream());
+        out.writeBytes(ParameterStringBuilder.getParamsString(parameters));
+        out.flush();
+        out.close();
+
+        int status = con.getResponseCode();
+        con.disconnect();
+
+        assertEquals(400, status);
+    }
+
+    @Test
+    public void testCriarUtilizadorMetodoPUT() throws IOException {
+        URL url = new URL("https://reqres.in/api/users");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("PUT");
+        con.setRequestProperty("Content-Type","application/json");
+        con.setRequestProperty("Authorization","QpwL5tke4Pnpja7X4");
+
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("email", "test@reqres.in");
+        parameters.put("first_name", "John");
+        parameters.put("last_name", "Doe");
+        parameters.put("avatar", "rgergeegrerre.jpg");
+
+        con.setDoOutput(true);
+        DataOutputStream out = new DataOutputStream(con.getOutputStream());
+        out.writeBytes(ParameterStringBuilder.getParamsString(parameters));
+        out.flush();
+        out.close();
+
+        int status = con.getResponseCode();
+        con.disconnect();
+
+        assertEquals(405, status);
+    }
+
+    @Test
+    public void testCriarUtilizadorMetodoDELETE() throws IOException {
+        URL url = new URL("https://reqres.in/api/users");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("DELETE");
+        con.setRequestProperty("Content-Type","application/json");
+        con.setRequestProperty("Authorization","QpwL5tke4Pnpja7X4");
+
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("email", "test@reqres.in");
+        parameters.put("first_name", "John");
+        parameters.put("last_name", "Doe");
+        parameters.put("avatar", "rgergeegrerre.jpg");
+
+        con.setDoOutput(true);
+        DataOutputStream out = new DataOutputStream(con.getOutputStream());
+        out.writeBytes(ParameterStringBuilder.getParamsString(parameters));
+        out.flush();
+        out.close();
+
+        int status = con.getResponseCode();
+        con.disconnect();
+
+        assertEquals(405, status);
+    }
+
+    @Test
+    public void testCriarUtilizadorTokenInvalido() throws IOException {
+        URL url = new URL("https://reqres.in/api/usersx");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("DELETE");
+        con.setRequestProperty("Content-Type","application/json");
+        con.setRequestProperty("Authorization","a");
+
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("email", "test@reqres.in");
+        parameters.put("first_name", "John");
+        parameters.put("last_name", "Doe");
+        parameters.put("avatar", "rgergeegrerre.jpg");
+
+        con.setDoOutput(true);
+        DataOutputStream out = new DataOutputStream(con.getOutputStream());
+        out.writeBytes(ParameterStringBuilder.getParamsString(parameters));
+        out.flush();
+        out.close();
+
+        int status = con.getResponseCode();
+        con.disconnect();
+
+        assertEquals(401, status);
+    }
+
+
+
+
+
+
 
 
     //testes atualizar utilizador
     @Test
     public void testAtualizarUtilizadorSucesso() throws IOException {
-        //funciona mesmo sem enviar o id
-        URL url = new URL("https://reqres.in/api/users/1");
+        URL url = new URL("https://reqres.in/api/users/5");
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         con.setRequestMethod("PUT");
+        con.setRequestProperty("Content-Type","application/json");
+        con.setRequestProperty("Authorization","QpwL5tke4Pnpja7X4");
 
         Map<String, String> parameters = new HashMap<>();
-        parameters.put("name", "morpheus");
-        parameters.put("job", "leader");
+        parameters.put("first_name", "John");
+        parameters.put("last_name", "Doe");
 
         con.setDoOutput(true);
         DataOutputStream out = new DataOutputStream(con.getOutputStream());
@@ -419,22 +1469,16 @@ public class TestsApi {
     }
 
     @Test
-    public void testAtualizarUtilizadorParametrosGrandes() throws IOException {
-        //funciona mesmo sem enviar o id
-        URL url = new URL("https://reqres.in/api/users/1");
+    public void testAtualizarUtilizadorLimiteMaximo() throws IOException {
+        URL url = new URL("https://reqres.in/api/users/12");
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         con.setRequestMethod("PUT");
+        con.setRequestProperty("Content-Type","application/json");
+        con.setRequestProperty("Authorization","QpwL5tke4Pnpja7X4");
 
         Map<String, String> parameters = new HashMap<>();
-        String name = "";
-        for (int i = 0; i < 99999; i++)
-            name+=("morpheus");
-        parameters.put("name", name);
-
-        String job = "";
-        for (int i = 0; i < 99999; i++)
-            job+=("leader");
-        parameters.put("job", job);
+        parameters.put("first_name", "John");
+        parameters.put("last_name", "Doe");
 
         con.setDoOutput(true);
         DataOutputStream out = new DataOutputStream(con.getOutputStream());
@@ -445,16 +1489,171 @@ public class TestsApi {
         int status = con.getResponseCode();
         con.disconnect();
 
-        assertEquals(413, status);
+        assertEquals(200, status);
     }
+
+    @Test
+    public void testAtualizarUtilizadorLimiteMinimo() throws IOException {
+        URL url = new URL("https://reqres.in/api/users/1");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("PUT");
+        con.setRequestProperty("Content-Type","application/json");
+        con.setRequestProperty("Authorization","QpwL5tke4Pnpja7X4");
+
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("first_name", "John");
+        parameters.put("last_name", "Doe");
+
+        con.setDoOutput(true);
+        DataOutputStream out = new DataOutputStream(con.getOutputStream());
+        out.writeBytes(ParameterStringBuilder.getParamsString(parameters));
+        out.flush();
+        out.close();
+
+        int status = con.getResponseCode();
+        con.disconnect();
+
+        assertEquals(200, status);
+    }
+
+    @Test
+    public void testAtualizarUtilizadorLimiteSuperior() throws IOException {
+        URL url = new URL("https://reqres.in/api/users/13");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("PUT");
+        con.setRequestProperty("Content-Type","application/json");
+        con.setRequestProperty("Authorization","QpwL5tke4Pnpja7X4");
+
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("first_name", "John");
+        parameters.put("last_name", "Doe");
+
+        con.setDoOutput(true);
+        DataOutputStream out = new DataOutputStream(con.getOutputStream());
+        out.writeBytes(ParameterStringBuilder.getParamsString(parameters));
+        out.flush();
+        out.close();
+
+        int status = con.getResponseCode();
+        con.disconnect();
+
+        assertEquals(404, status);
+    }
+
+    @Test
+    public void testAtualizarUtilizadoLimiteInferior() throws IOException {
+        URL url = new URL("https://reqres.in/api/users/0");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("PUT");
+        con.setRequestProperty("Content-Type","application/json");
+        con.setRequestProperty("Authorization","QpwL5tke4Pnpja7X4");
+
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("first_name", "John");
+        parameters.put("last_name", "Doe");
+
+        con.setDoOutput(true);
+        DataOutputStream out = new DataOutputStream(con.getOutputStream());
+        out.writeBytes(ParameterStringBuilder.getParamsString(parameters));
+        out.flush();
+        out.close();
+
+        int status = con.getResponseCode();
+        con.disconnect();
+
+        assertEquals(404, status);
+    }
+
+    @Test
+    public void testAtualizarUtilizadorContentTypeInvalido() throws IOException {
+        URL url = new URL("https://reqres.in/api/users/5");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("PUT");
+        con.setRequestProperty("Content-Type","application/xml");
+        con.setRequestProperty("Authorization","QpwL5tke4Pnpja7X4");
+
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("first_name", "John");
+        parameters.put("last_name", "Doe");
+
+        con.setDoOutput(true);
+        DataOutputStream out = new DataOutputStream(con.getOutputStream());
+        out.writeBytes(ParameterStringBuilder.getParamsString(parameters));
+        out.flush();
+        out.close();
+
+        int status = con.getResponseCode();
+        con.disconnect();
+
+        assertEquals(400, status);
+    }
+
+    @Test
+    public void testAtualizarUtilizadorMetodoPOST() throws IOException {
+        URL url = new URL("https://reqres.in/api/users/5");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("POST");
+        con.setRequestProperty("Content-Type","application/json");
+        con.setRequestProperty("Authorization","QpwL5tke4Pnpja7X4");
+
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("first_name", "John");
+        parameters.put("last_name", "Doe");
+
+        con.setDoOutput(true);
+        DataOutputStream out = new DataOutputStream(con.getOutputStream());
+        out.writeBytes(ParameterStringBuilder.getParamsString(parameters));
+        out.flush();
+        out.close();
+
+        int status = con.getResponseCode();
+        con.disconnect();
+
+        assertEquals(405, status);
+    }
+
+    @Test
+    public void testAtualizarUtilizadorTokenInvalido() throws IOException {
+        URL url = new URL("https://reqres.in/api/users/5");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("POST");
+        con.setRequestProperty("Content-Type","application/json");
+        con.setRequestProperty("Authorization","a");
+
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("first_name", "John");
+        parameters.put("last_name", "Doe");
+
+        con.setDoOutput(true);
+        DataOutputStream out = new DataOutputStream(con.getOutputStream());
+        out.writeBytes(ParameterStringBuilder.getParamsString(parameters));
+        out.flush();
+        out.close();
+
+        int status = con.getResponseCode();
+        con.disconnect();
+
+        assertEquals(401, status);
+    }
+
+
+
+
+
+
+
+
+
 
 
     //testes apagar atualizador
     @Test
-    public void testApagarUtilizadorSucesso() throws IOException {
-        URL url = new URL("https://reqres.in/api/users/2");
+    public void testApagarUtilizadorLimiteMaximo() throws IOException {
+        URL url = new URL("https://reqres.in/api/users/12");
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         con.setRequestMethod("DELETE");
+        con.setRequestProperty("Content-Type","application/json");
+        con.setRequestProperty("Authorization","QpwL5tke4Pnpja7X4");
 
         int status = con.getResponseCode();
         con.disconnect();
@@ -463,77 +1662,175 @@ public class TestsApi {
     }
 
     @Test
-    public void testApagarUtilizadorIdGrande() throws IOException {
-        String id="";
-        for(int i=0;i<10000;i++)
-            id+="1";
-        URL url = new URL("https://reqres.in/api/users/"+id);
+    public void testApagarUtilizadorLimiteMinimo() throws IOException {
+        URL url = new URL("https://reqres.in/api/users/1");
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         con.setRequestMethod("DELETE");
+        con.setRequestProperty("Content-Type","application/json");
+        con.setRequestProperty("Authorization","QpwL5tke4Pnpja7X4");
 
         int status = con.getResponseCode();
         con.disconnect();
 
-        assertEquals(414, status);
+        assertEquals(204, status);
     }
+
+    @Test
+    public void testApagarUtilizadorLimiteSuperior() throws IOException {
+        URL url = new URL("https://reqres.in/api/users/13");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("DELETE");
+        con.setRequestProperty("Content-Type","application/json");
+        con.setRequestProperty("Authorization","QpwL5tke4Pnpja7X4");
+
+        int status = con.getResponseCode();
+        con.disconnect();
+
+        assertEquals(404, status);
+    }
+
+    @Test
+    public void testApagarUtilizadoLimiteInferior() throws IOException {
+        URL url = new URL("https://reqres.in/api/users/0");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("DELETE");
+        con.setRequestProperty("Content-Type","application/json");
+        con.setRequestProperty("Authorization","QpwL5tke4Pnpja7X4");
+
+        int status = con.getResponseCode();
+        con.disconnect();
+
+        assertEquals(404, status);
+    }
+
+    @Test
+    public void testApagarUtilizadorContentTypeInvalido() throws IOException {
+        URL url = new URL("https://reqres.in/api/users/2");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("DELETE");
+        con.setRequestProperty("Content-Type","application/xml");
+        con.setRequestProperty("Authorization","QpwL5tke4Pnpja7X4");
+
+        int status = con.getResponseCode();
+        con.disconnect();
+
+        assertEquals(404, status);
+    }
+
+    @Test
+    public void testApagarUtilizadorTokenInvalido() throws IOException {
+        URL url = new URL("https://reqres.in/api/usersx/2");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("DELETE");
+        con.setRequestProperty("Content-Type","application/json");
+        con.setRequestProperty("Authorization","a");
+
+        int status = con.getResponseCode();
+        con.disconnect();
+
+        assertEquals(404, status);
+    }
+
+
+
+
+
+
+
+
 
 
     //testes consultar utilizador
     @Test
-    public void testConsultarUtilizadorSucesso() throws IOException {
-        URL url1 = new URL("https://reqres.in/api/users/1");
-        HttpURLConnection con1 = (HttpURLConnection) url1.openConnection();
-        con1.setRequestMethod("GET");
-
-        int status1 = con1.getResponseCode();
-        con1.disconnect();
-
-        URL url2 = new URL("https://reqres.in/api/users/12");
-        HttpURLConnection con2 = (HttpURLConnection) url2.openConnection();
-        con2.setRequestMethod("GET");
-
-        int status2 = con2.getResponseCode();
-        con2.disconnect();
-
-        assertEquals(200, status1);
-        assertEquals(200, status2);
-    }
-
-    @Test
-    public void testConsultarUtilizadorInexistente() throws IOException {
-        URL url1 = new URL("https://reqres.in/api/users/0");
-        HttpURLConnection con1 = (HttpURLConnection) url1.openConnection();
-        con1.setRequestMethod("GET");
-
-        int status1 = con1.getResponseCode();
-        con1.disconnect();
-
-        URL url2 = new URL("https://reqres.in/api/users/13");
-        HttpURLConnection con2 = (HttpURLConnection) url2.openConnection();
-        con2.setRequestMethod("GET");
-
-        int status2 = con2.getResponseCode();
-        con2.disconnect();
-
-        assertEquals(404, status1);
-        assertEquals(404, status2);
-    }
-
-    @Test
-    public void testConsultarUtilizadorIdGrande() throws IOException {
-        String id="";
-        for(int i=0;i<10000;i++)
-            id+="1";
-
-        URL url = new URL("https://reqres.in/api/users/"+id);
+    public void testConsultarUtilizadorLimiteMaximo() throws IOException {
+        URL url = new URL("https://reqres.in/api/users/12");
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         con.setRequestMethod("GET");
+        con.setRequestProperty("Content-Type","application/json");
+        con.setRequestProperty("Authorization","QpwL5tke4Pnpja7X4");
 
         int status = con.getResponseCode();
         con.disconnect();
 
-        assertEquals(414, status);
+        assertEquals(200, status);
     }
+
+    @Test
+    public void testConsultarUtilizadorLimiteMinimo() throws IOException {
+        URL url = new URL("https://reqres.in/api/users/1");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("GET");
+        con.setRequestProperty("Content-Type","application/json");
+        con.setRequestProperty("Authorization","QpwL5tke4Pnpja7X4");
+
+        int status = con.getResponseCode();
+        con.disconnect();
+
+        assertEquals(200, status);
+    }
+
+    @Test
+    public void testConsultarUtilizadorLimiteSuperior() throws IOException {
+        URL url = new URL("https://reqres.in/api/users/13");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("GET");
+        con.setRequestProperty("Content-Type","application/json");
+        con.setRequestProperty("Authorization","QpwL5tke4Pnpja7X4");
+
+        int status = con.getResponseCode();
+        con.disconnect();
+
+        assertEquals(404, status);
+    }
+
+    @Test
+    public void testConsultarUtilizadorLimiteInferior() throws IOException {
+        URL url = new URL("https://reqres.in/api/users/0");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("GET");
+        con.setRequestProperty("Content-Type","application/json");
+        con.setRequestProperty("Authorization","QpwL5tke4Pnpja7X4");
+
+        int status = con.getResponseCode();
+        con.disconnect();
+
+        assertEquals(404, status);
+    }
+
+    @Test
+    public void testConsultarUtilizadorContentTypeInvalido() throws IOException {
+        URL url = new URL("https://reqres.in/api/users/2");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("GET");
+        con.setRequestProperty("Content-Type","application/xml");
+        con.setRequestProperty("Authorization","QpwL5tke4Pnpja7X4");
+
+        int status = con.getResponseCode();
+        con.disconnect();
+
+        assertEquals(400, status);
+    }
+
+    @Test
+    public void testConsultarUtilizadorTokenInvalido() throws IOException {
+        URL url = new URL("https://reqres.in/api/users/2");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("GET");
+        con.setRequestProperty("Content-Type","application/json");
+        con.setRequestProperty("Authorization","a");
+
+        int status = con.getResponseCode();
+        con.disconnect();
+
+        assertEquals(401, status);
+    }
+
+
+
+
+
+
+
 
 
     //testes listar utilizadores
@@ -542,6 +1839,8 @@ public class TestsApi {
         URL url = new URL("https://reqres.in/api/users");
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         con.setRequestMethod("GET");
+        con.setRequestProperty("Content-Type","application/json");
+        con.setRequestProperty("Authorization","QpwL5tke4Pnpja7X4");
 
         int status = con.getResponseCode();
         con.disconnect();
@@ -549,12 +1848,49 @@ public class TestsApi {
         assertEquals(200, status);
     }
 
+    @Test
+    public void testListarUtilizadoresContentTypeInvalido() throws IOException {
+        URL url = new URL("https://reqres.in/api/users");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("GET");
+        con.setRequestProperty("Content-Type","application/xml");
+        con.setRequestProperty("Authorization","QpwL5tke4Pnpja7X4");
 
+        int status = con.getResponseCode();
+        con.disconnect();
+
+        assertEquals(400, status);
+    }
+
+    @Test
+    public void testListarUtilizadoresTokenInvalido() throws IOException {
+        URL url = new URL("https://reqres.in/api/users");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("GET");
+        con.setRequestProperty("Content-Type","application/json");
+        con.setRequestProperty("Authorization","a");
+
+        int status = con.getResponseCode();
+        con.disconnect();
+
+        assertEquals(401, status);
+    }
+
+
+
+
+
+
+
+
+    //testes listar recursos
     @Test
     public void testListarRecursosSucesso() throws IOException {
         URL url = new URL("https://reqres.in/api/unknown");
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         con.setRequestMethod("GET");
+        con.setRequestProperty("Content-Type","application/json");
+        con.setRequestProperty("Authorization","QpwL5tke4Pnpja7X4");
 
         int status = con.getResponseCode();
         con.disconnect();
@@ -562,75 +1898,228 @@ public class TestsApi {
         assertEquals(200, status);
     }
 
-
     @Test
-    public void testConsultarRecursoSucesso() throws IOException {
-        URL url1 = new URL("https://reqres.in/api/unknown/1");
-        HttpURLConnection con1 = (HttpURLConnection) url1.openConnection();
-        con1.setRequestMethod("GET");
-
-        int status1 = con1.getResponseCode();
-        con1.disconnect();
-
-        URL url2 = new URL("https://reqres.in/api/unknown/12");
-        HttpURLConnection con2 = (HttpURLConnection) url2.openConnection();
-        con2.setRequestMethod("GET");
-
-        int status2 = con2.getResponseCode();
-        con2.disconnect();
-
-        assertEquals(200, status1);
-        assertEquals(200, status2);
-    }
-
-    @Test
-    public void testConsultarRecursoInexistente() throws IOException {
-        URL url1 = new URL("https://reqres.in/api/unknown/0");
-        HttpURLConnection con1 = (HttpURLConnection) url1.openConnection();
-        con1.setRequestMethod("GET");
-
-        int status1 = con1.getResponseCode();
-        con1.disconnect();
-
-        URL url2 = new URL("https://reqres.in/api/unknown/13");
-        HttpURLConnection con2 = (HttpURLConnection) url2.openConnection();
-        con2.setRequestMethod("GET");
-
-        int status2 = con2.getResponseCode();
-        con2.disconnect();
-
-        assertEquals(404, status1);
-        assertEquals(404, status2);
-    }
-
-    @Test
-    public void testConsultarRecursoIdGrande() throws IOException {
-        String id="";
-        for(int i=0;i<10000;i++)
-            id+="1";
-
-        URL url = new URL("https://reqres.in/api/unknown/"+id);
+    public void testListarRecursosContentTypeInvalido() throws IOException {
+        URL url = new URL("https://reqres.in/api/unknown");
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         con.setRequestMethod("GET");
+        con.setRequestProperty("Content-Type","application/xml");
+        con.setRequestProperty("Authorization","QpwL5tke4Pnpja7X4");
 
         int status = con.getResponseCode();
         con.disconnect();
 
-        assertEquals(414, status);
+        assertEquals(400, status);
+    }
+
+    @Test
+    public void testListarRecursosMetodoPOST() throws IOException {
+        URL url = new URL("https://reqres.in/api/unknown");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("POST");
+        con.setRequestProperty("Content-Type","application/json");
+        con.setRequestProperty("Authorization","QpwL5tke4Pnpja7X4");
+
+        int status = con.getResponseCode();
+        con.disconnect();
+
+        assertEquals(405, status);
+    }
+
+    @Test
+    public void testListarRecursosMetodoPUT() throws IOException {
+        URL url = new URL("https://reqres.in/api/unknown");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("PUT");
+        con.setRequestProperty("Content-Type","application/json");
+        con.setRequestProperty("Authorization","QpwL5tke4Pnpja7X4");
+
+        int status = con.getResponseCode();
+        con.disconnect();
+
+        assertEquals(405, status);
+    }
+
+    @Test
+    public void testListarRecursosMetodoDELETE() throws IOException {
+        URL url = new URL("https://reqres.in/api/unknown");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("DELETE");
+        con.setRequestProperty("Content-Type","application/json");
+        con.setRequestProperty("Authorization","QpwL5tke4Pnpja7X4");
+
+        int status = con.getResponseCode();
+        con.disconnect();
+
+        assertEquals(500, status);
+    }
+
+    @Test
+    public void testListarRecursosTokenInvalido() throws IOException {
+        URL url = new URL("https://reqres.in/api/unknown");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("GET");
+        con.setRequestProperty("Content-Type","application/json");
+        con.setRequestProperty("Authorization","a");
+
+        int status = con.getResponseCode();
+        con.disconnect();
+
+        assertEquals(401, status);
     }
 
 
 
+
+
+
+
+
+    //testes consultar recurso
     @Test
-    public void testDelay() throws IOException {
-        URL url = new URL("https://reqres.in/api/users?delay=3");
+    public void testConsultarRecursoLimiteMaximo() throws IOException {
+        URL url = new URL("https://reqres.in/api/unknown/12");
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         con.setRequestMethod("GET");
+        con.setRequestProperty("Content-Type","application/json");
+        con.setRequestProperty("Authorization","QpwL5tke4Pnpja7X4");
 
         int status = con.getResponseCode();
         con.disconnect();
 
         assertEquals(200, status);
     }
+
+    @Test
+    public void testConsultarRecursoLimiteMinimo() throws IOException {
+        URL url = new URL("https://reqres.in/api/unknown/1");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("GET");
+        con.setRequestProperty("Content-Type","application/json");
+        con.setRequestProperty("Authorization","QpwL5tke4Pnpja7X4");
+
+        int status = con.getResponseCode();
+        con.disconnect();
+
+        assertEquals(200, status);
+    }
+
+    @Test
+    public void testConsultarRecursoLimiteSuperior() throws IOException {
+        URL url = new URL("https://reqres.in/api/unknown/13");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("GET");
+        con.setRequestProperty("Content-Type","application/json");
+        con.setRequestProperty("Authorization","QpwL5tke4Pnpja7X4");
+
+        int status = con.getResponseCode();
+        con.disconnect();
+
+        assertEquals(404, status);
+    }
+
+    @Test
+    public void testConsultarRecursoLimiteInferior() throws IOException {
+        URL url = new URL("https://reqres.in/api/unknown/0");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("GET");
+        con.setRequestProperty("Content-Type","application/json");
+        con.setRequestProperty("Authorization","QpwL5tke4Pnpja7X4");
+
+        int status = con.getResponseCode();
+        con.disconnect();
+
+        assertEquals(404, status);
+    }
+
+    @Test
+    public void testConsultarRecursoContentTypeInvalido() throws IOException {
+        URL url = new URL("https://reqres.in/api/unknown/2");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("GET");
+        con.setRequestProperty("Content-Type","application/xml");
+        con.setRequestProperty("Authorization","QpwL5tke4Pnpja7X4");
+
+        int status = con.getResponseCode();
+        con.disconnect();
+
+        assertEquals(400, status);
+    }
+
+    @Test
+    public void testConsultarRecursosMetodoPOST() throws IOException {
+        URL url = new URL("https://reqres.in/api/unknown/2");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("POST");
+        con.setRequestProperty("Content-Type","application/json");
+        con.setRequestProperty("Authorization","QpwL5tke4Pnpja7X4");
+
+        int status = con.getResponseCode();
+        con.disconnect();
+
+        assertEquals(405, status);
+    }
+
+    @Test
+    public void testConsultarRecursosMetodoPUT() throws IOException {
+        URL url = new URL("https://reqres.in/api/unknown/2");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("POST");
+        con.setRequestProperty("Content-Type","application/json");
+        con.setRequestProperty("Authorization","QpwL5tke4Pnpja7X4");
+
+        int status = con.getResponseCode();
+        con.disconnect();
+
+        assertEquals(405, status);
+    }
+
+    @Test
+    public void testConsultarRecursosMetodoDELETE() throws IOException {
+        URL url = new URL("https://reqres.in/api/users/2");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("DELETE");
+        con.setRequestProperty("Content-Type","application/json");
+        con.setRequestProperty("Authorization","QpwL5tke4Pnpja7X4");
+
+        int status = con.getResponseCode();
+        con.disconnect();
+
+        assertEquals(405, status);
+    }
+
+    @Test
+    public void testConsultarRecursoTokenInvalido() throws IOException {
+        URL url = new URL("https://reqres.in/api/unknown/2");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("GET");
+        con.setRequestProperty("Content-Type","application/json");
+        con.setRequestProperty("Authorization","a");
+
+        int status = con.getResponseCode();
+        con.disconnect();
+
+        assertEquals(401, status);
+    }
+
+
+
+
+    //test endpoint invalido
+    @Test
+    public void testAPIEndpointInvalido() throws IOException {
+        URL url = new URL("https://reqres.in/api/test");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("GET");
+        con.setRequestProperty("Content-Type","application/json");
+        con.setRequestProperty("Authorization","QpwL5tke4Pnpja7X4");
+
+        int status = con.getResponseCode();
+        con.disconnect();
+
+        assertEquals(404, status);
+    }
+
+
 
 }

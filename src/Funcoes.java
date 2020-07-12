@@ -13,21 +13,18 @@ import java.util.Map;
 
 public class Funcoes {
 
-    public static Resposta criarUtilizador(Utilizador utilizador) throws IOException {
+    public static Resposta criarUtilizador(Utilizador utilizador) throws IOException, NullEmptyFieldException, InvalidEmailFormatException, UserExistingException {
 
-        if (utilizador == null)
-            return new Resposta().criarUtilizadorNull();
+        if (utilizador.getEmail() == null || utilizador.getEmail().isEmpty())
+            throw new NullEmptyFieldException();
 
-        if (utilizador.getEmail() == null)
-            return new Resposta().criarUtilizadorEmailVazioNulo();
+        if (!utilizador.getEmail().contains("@") || !utilizador.getEmail().contains("."))
+            throw new InvalidEmailFormatException();
 
-        if (utilizador.getEmail().isEmpty())
-            return new Resposta().criarUtilizadorEmailVazioNulo();
+        if (!(utilizador.getEmail().length() >= 8 && utilizador.getEmail().length() <= 30))
+            throw new InvalidEmailFormatException();
 
-        if (!utilizador.getEmail().contains("@"))
-            return new Resposta().criarUtilizadorEmailFormatoInvalido();
-
-        URL url = new URL("https://reqres.in/api/users/");
+        URL url = new URL("https://reqres.in/api/users");
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         con.setRequestMethod("POST");
 
@@ -59,86 +56,32 @@ public class Funcoes {
         }
         con.disconnect();
 
+        if(status==409)
+            throw new UserExistingException();
 
         return new Resposta().criarUtilizadorSucesso();
 
 
     }
 
-    public static Resposta consultarDadosUtilizador(String id) throws IOException, JSONException {
-        if (id == null)
-            return new Resposta().consultarDadosUtilizadorIdVazioNulo();
-
-        if (id.isEmpty())
-            return new Resposta().consultarDadosUtilizadorIdVazioNulo();
-
-
-        URL url = new URL("https://reqres.in/api/users/" + id);
-        HttpURLConnection con = (HttpURLConnection) url.openConnection();
-        con.setRequestMethod("GET");
-
-        int status = con.getResponseCode();
-
-        JSONObject object = null;
-        JSONObject data = null;
-        StringBuffer content = new StringBuffer();
-        InputStream inputStream = con.getErrorStream();
-        if (inputStream == null) {
-            BufferedReader in = new BufferedReader(
-                    new InputStreamReader(con.getInputStream()));
-            String inputLine;
-            while ((inputLine = in.readLine()) != null) {
-                content.append(inputLine);
-            }
-            object = new JSONObject(content.toString());
-            data = object.getJSONObject("data");
-            in.close();
-        }
-        con.disconnect();
-
-        if (status == 200) {
-            Utilizador utilizador = new Utilizador(String.valueOf(data.getString("id")), data.getString("email"), data.getString("first_name"), data.getString("last_name"), data.getString("avatar"));
-            return new Resposta().consultarDadosUtilizadorExistente(utilizador);
-        }
-
-        return new Resposta().consultarDadosUtilizadorInexistente();
-
-    }
-
-    public static Resposta listarUtilizadores() throws IOException, JSONException {
-        URL url = new URL("https://reqres.in/api/users");
-        HttpURLConnection con = (HttpURLConnection) url.openConnection();
-        con.setRequestMethod("GET");
-
-        BufferedReader in = new BufferedReader(
-                new InputStreamReader(con.getInputStream()));
-        String inputLine;
-        StringBuffer content = new StringBuffer();
-        while ((inputLine = in.readLine()) != null) {
-            content.append(inputLine);
-        }
-
-        JSONObject object = new JSONObject(content.toString());
-        JSONArray array = object.getJSONArray("data");
-
-        ArrayList<Utilizador> utilizadores = new ArrayList<>();
-        for (int i = 0; i < array.length(); i++) {
-            utilizadores.add(new Utilizador(String.valueOf(array.getJSONObject(i).getInt("id")), array.getJSONObject(i).getString("email"), array.getJSONObject(i).getString("first_name"), array.getJSONObject(i).getString("last_name"), array.getJSONObject(i).getString("avatar")));
-        }
-
-        return new Resposta().listarUtilizadoresSucesso(utilizadores);
-    }
-
-
-    public static Resposta registarUtilizador(String email, String password) throws IOException {
+    public static Resposta registarUtilizador(String email, String password) throws IOException, NullEmptyFieldException, UserNotFoundException, InvalidEmailFormatException, InvalidPasswordFormatException, UserExistingException {
 
         if (email == null || password == null)
-            return new Resposta().registarUtilizadorCredenciaisVazias();
+            throw new NullEmptyFieldException();
 
         if (email.isEmpty() || password.isEmpty())
-            return new Resposta().registarUtilizadorCredenciaisVazias();
+            throw new NullEmptyFieldException();
 
-        URL url = new URL("https://reqres.in/api/register/");
+        if (!email.contains("@") || !email.contains("."))
+            throw new InvalidEmailFormatException();
+
+        if (!(email.length() >= 8 && email.length() <= 30))
+            throw new InvalidEmailFormatException();
+
+        if (!(password.length() >= 6 && password.length() <= 20))
+            throw new InvalidPasswordFormatException();
+
+        URL url = new URL("https://reqres.in/api/register");
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         con.setRequestMethod("POST");
 
@@ -169,20 +112,32 @@ public class Funcoes {
 
         if (status == 200)
             return new Resposta().registarUtilizadorSucesso();
-        return new Resposta().registarUtilizadorNaoCriado();
+
+        if(status==400)
+            throw new UserNotFoundException();
+
+        throw new UserExistingException();
 
     }
 
-
-    public static Resposta autenticarUtilizador(String email, String password) throws IOException {
+    public static Resposta autenticarUtilizador(String email, String password) throws IOException, NullEmptyFieldException, InvalidCredentialsException, InvalidEmailFormatException, InvalidPasswordFormatException {
 
         if (email == null || password == null)
-            return new Resposta().autenticarUtilizadorCredenciaisVazias();
+            throw new NullEmptyFieldException();
 
         if (email.isEmpty() || password.isEmpty())
-            return new Resposta().autenticarUtilizadorCredenciaisVazias();
+            throw new NullEmptyFieldException();
 
-        URL url = new URL("https://reqres.in/api/login/");
+        if (!email.contains("@") || !email.contains("."))
+            throw new InvalidEmailFormatException();
+
+        if (!(email.length() >= 8 && email.length() <= 30))
+            throw new InvalidEmailFormatException();
+
+        if (!(password.length() >= 6 && password.length() <= 20))
+            throw new InvalidPasswordFormatException();
+
+        URL url = new URL("https://reqres.in/api/login");
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         con.setRequestMethod("POST");
 
@@ -214,18 +169,101 @@ public class Funcoes {
         if (status == 200)
             return new Resposta().autenticarUtilizadorSucesso();
 
-        return new Resposta().autenticarUtilizadorCredenciaisInvalidas();
+        throw new InvalidCredentialsException();
 
     }
 
+    public static Resposta consultarDadosUtilizador(String id) throws IOException, JSONException, NullEmptyFieldException, UserNotFoundException {
 
-    public static Resposta consultarRecurso(String id) throws IOException, JSONException {
+        if (id == null || id.isEmpty())
+            throw new NullEmptyFieldException();
 
-        if (id == null)
-            return new Resposta().consultarRecursoIdVazioNulo();
+        URL url = new URL("https://reqres.in/api/users/" + id);
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("GET");
 
-        if (id.isEmpty())
-            return new Resposta().consultarRecursoIdVazioNulo();
+        int status = con.getResponseCode();
+
+        JSONObject object = null;
+        JSONObject data = null;
+        StringBuffer content = new StringBuffer();
+        InputStream inputStream = con.getErrorStream();
+        if (inputStream == null) {
+            BufferedReader in = new BufferedReader(
+                    new InputStreamReader(con.getInputStream()));
+            String inputLine;
+            while ((inputLine = in.readLine()) != null) {
+                content.append(inputLine);
+            }
+            object = new JSONObject(content.toString());
+            data = object.getJSONObject("data");
+            in.close();
+        }
+        con.disconnect();
+
+        if (status == 200) {
+            Utilizador utilizador = new Utilizador(String.valueOf(data.getString("id")), data.getString("email"), data.getString("first_name"), data.getString("last_name"), data.getString("avatar"));
+            return new Resposta().consultarDadosUtilizadorExistente(utilizador);
+        }
+
+        throw new UserNotFoundException();
+
+    }
+
+    public static Resposta listarUtilizadores() throws IOException, JSONException {
+        URL url = new URL("https://reqres.in/api/users");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("GET");
+
+        BufferedReader in = new BufferedReader(
+                new InputStreamReader(con.getInputStream()));
+        String inputLine;
+        StringBuffer content = new StringBuffer();
+        while ((inputLine = in.readLine()) != null) {
+            content.append(inputLine);
+        }
+
+        JSONObject object = new JSONObject(content.toString());
+        JSONArray array = object.getJSONArray("data");
+
+        ArrayList<Utilizador> utilizadores = new ArrayList<>();
+        for (int i = 0; i < array.length(); i++) {
+            utilizadores.add(new Utilizador(String.valueOf(array.getJSONObject(i).getInt("id")), array.getJSONObject(i).getString("email"), array.getJSONObject(i).getString("first_name"), array.getJSONObject(i).getString("last_name"), array.getJSONObject(i).getString("avatar")));
+        }
+
+        return new Resposta().listarUtilizadoresSucesso(utilizadores);
+    }
+
+    public static Resposta listarRecursos() throws IOException, JSONException {
+        URL url = new URL("https://reqres.in/api/unknown");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("GET");
+
+        BufferedReader in = new BufferedReader(
+                new InputStreamReader(con.getInputStream()));
+        String inputLine;
+        StringBuffer content = new StringBuffer();
+        while ((inputLine = in.readLine()) != null) {
+            content.append(inputLine);
+        }
+        in.close();
+        con.disconnect();
+
+        JSONObject object = new JSONObject(content.toString());
+        JSONArray array = object.getJSONArray("data");
+
+        ArrayList<Recurso> recursos = new ArrayList<>();
+        for (int i = 0; i < array.length(); i++) {
+            recursos.add(new Recurso(String.valueOf(array.getJSONObject(i).getInt("id")), array.getJSONObject(i).getString("name"), array.getJSONObject(i).getString("year"), array.getJSONObject(i).getString("color"), array.getJSONObject(i).getString("pantone_value")));
+        }
+
+        return new Resposta().listarRecursosSucesso(recursos);
+    }
+
+    public static Resposta consultarRecurso(String id) throws IOException, JSONException, NullEmptyFieldException, ResourceNotFoundException {
+
+        if (id == null || id.isEmpty())
+            throw new NullEmptyFieldException();
 
         URL url = new URL("https://reqres.in/api/unknown/" + id);
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
@@ -257,33 +295,7 @@ public class Funcoes {
             return new Resposta().consultarRecursoExistente(recurso);
         }
 
-        return new Resposta().consultarRecursoInexistente();
-    }
-
-    public static Resposta listarRecursos() throws IOException, JSONException {
-        URL url = new URL("https://reqres.in/api/unknown");
-        HttpURLConnection con = (HttpURLConnection) url.openConnection();
-        con.setRequestMethod("GET");
-
-        BufferedReader in = new BufferedReader(
-                new InputStreamReader(con.getInputStream()));
-        String inputLine;
-        StringBuffer content = new StringBuffer();
-        while ((inputLine = in.readLine()) != null) {
-            content.append(inputLine);
-        }
-        in.close();
-        con.disconnect();
-
-        JSONObject object = new JSONObject(content.toString());
-        JSONArray array = object.getJSONArray("data");
-
-        ArrayList<Recurso> recursos = new ArrayList<>();
-        for (int i = 0; i < array.length(); i++) {
-            recursos.add(new Recurso(String.valueOf(array.getJSONObject(i).getInt("id")), array.getJSONObject(i).getString("name"), array.getJSONObject(i).getString("year"), array.getJSONObject(i).getString("color"), array.getJSONObject(i).getString("pantone_value")));
-        }
-
-        return new Resposta().listarRecursosSucesso(recursos);
+        throw new ResourceNotFoundException();
     }
 
 }
